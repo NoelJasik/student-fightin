@@ -1,14 +1,23 @@
-cmake_minimum_required(VERSION 4.0)
-project(uniProject)
+cmake_minimum_required(VERSION 3.15)
+project(uniProject LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 26)
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
+set(CMAKE_CXX_STANDARD 17)
 
-set(SDL2_PATH ${CMAKE_SOURCE_DIR}/SDL2-2.32.10/x86_64-w64-mingw32)
+include(FetchContent)
 
-find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIR})
+# Teraz SDL2 pobiera się z automatu
+FetchContent_Declare(
+        SDL2
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+        GIT_TAG release-2.30.5
+)
+
+FetchContent_MakeAvailable(SDL2)
 
 add_executable(uniProject main.cpp)
 
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY})
+target_link_libraries(uniProject PRIVATE SDL2::SDL2 SDL2::SDL2main)
+
+target_include_directories(uniProject PRIVATE
+        ${SDL2_INCLUDE_DIRS}
+)

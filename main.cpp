@@ -5,6 +5,12 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 
+    // Sprawdzanie errorów
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        cout << "SDL_Init error: " << SDL_GetError() << endl;
+        return 1;
+    }
+
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
     SDL_Event e;
@@ -26,13 +32,13 @@ int main(int argc, char* argv[]) {
                     case SDLK_RIGHT:
                         player.x += 50;
                         break;
-                        case SDLK_LEFT:
+                    case SDLK_LEFT:
                         player.x -= 50;
                         break;
-                        case SDLK_UP:
+                    case SDLK_UP:
                         player.y -= 50;
                         break;
-                        case SDLK_DOWN:
+                    case SDLK_DOWN:
                         player.y += 50;
                         break;
                 }
