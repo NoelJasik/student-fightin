@@ -13,7 +13,7 @@ OpenGL + SDL2 + CMake + C++
 ## Design doc 
 ### mechaniki (do mvp)
 - Zadaniem gracza jest obrona budynku agh przed kibolami, gracz widzi całą planszę z lotu ptaka
-- Gracz przeciąga na plansze postacie/obiekty, może je wrzucić w dowolny obszar po prawej połowie ekranu (bo na całej mapce zbyt op imo)
+- Gracz przeciąga na plansze postacie/obiekty, może je wrzucić w dowolny obszar po lewej połowie ekranu (bo na całej mapce zbyt op imo)
 - Do dyspozycji mamy 3 (lub więcej ale to trzeba wymyśleć) typy jednostek. każda jednostka powinna być unikatowa a nie po prostu reskin z lepszymi statami
   - student - podchodzi do kibola i się z nim bije (jak w tej gierce rycerze https://youtu.be/EvEGuTAsYp4?si=GamT-wYS7684qhyB&t=8)
   - Koparka - wrzucamy na plansze i po prostu jedzie przed siebie, taranuje wszystkich na drodze
