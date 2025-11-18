@@ -32,6 +32,9 @@ OpenGL + SDL2 + CMake + C++
 - Ustawienia
 - Sklepik studenciak gdzie można kupować/wybrać jedno za free ulepszenia/e do jednostek pomiędzy falami
 - intro i menusy
+
+### lore possibly
+kartka w zeszycie znudzonego studenta na 6 godzinie fizyki
 ### artstyle
 Artstyle będzie wyglądał tak jakby gierka była narysowana odręcznie, na kartce w zeszycie.
 
