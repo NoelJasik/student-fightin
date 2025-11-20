@@ -35,6 +35,7 @@ void gameObject::setMoveSpeed(int _ySpeed, int _xSpeed) {
     xSpeed = _xSpeed;
 }
 
+// wywoływane co klatkę
 void gameObject::update() {
    moveBySpeed();
 }
