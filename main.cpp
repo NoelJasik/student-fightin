@@ -10,6 +10,30 @@ vector <SDL_Rect> towers;
 static int _WIDTH = 1280;
 static int _HEIGHT = 720;
 
+void spawnTower(int x, int y, int type) {
+    SDL_Rect tower;
+    tower.x = x;
+    tower.y = y;
+    switch (type) {
+        default:
+            return;
+        case 1:
+            tower.w = 20;
+            tower.h = 20;
+            break;
+            case 2:
+            tower.w = 30;
+            tower.h = 20;
+            break;
+            case 3:
+            tower.w = 40;
+            tower.h = 40;
+            break;
+    }
+    // można dodać różne typy wież w zależności od zmiennej type
+    towers.push_back(tower);
+}
+
 int main(int argc, char *argv[]) {
     // Sprawdzanie errorów
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -23,6 +47,8 @@ int main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_EVERYTHING);
     bool running = true;
     SDL_Rect player{10, 10, 10, 20};
+    // 0 - brak 1 - piechota 2 - killdozer 3 - działko
+    int current_tower = 0;
 
 
 
@@ -56,12 +82,27 @@ int main(int argc, char *argv[]) {
          if (e.type == SDL_QUIT) {
              running = false;
          }
+            // wybór typu wieży
+         if (e.type == SDL_KEYDOWN) {
+             switch (e.key.keysym.sym) {
+                 case SDLK_1:
+                     current_tower = 1;
+                     break;
+                 case SDLK_2:
+                     current_tower = 2;
+                     break;
+                 case SDLK_3:
+                     current_tower = 3;
+                     break;
+             }
+             cout << current_tower << endl;
+         }
+
          // stawianie wieży w pozycji kursora
          if (e.type == SDL_MOUSEBUTTONDOWN) {
              // można stawiać tylko w lewej połowie ekranu
              if (e.button.button == SDL_BUTTON_LEFT && e.button.x <= _WIDTH / 2) {
-                 SDL_Rect tower{ e.button.x, e.button.y, player.w, player.h };
-                 towers.push_back(tower);
+                 spawnTower(e.button.x , e.button.y, current_tower);
              }
          }
          // wychodzenie z gry
