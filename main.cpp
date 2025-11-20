@@ -136,6 +136,7 @@ int main(int argc, char *argv[]) {
 
         for (auto& t : towers) {
             SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
+            // to trzeba zrobić matematycznie żeby działało niezależnie od fps
             t.update();
         }
 
