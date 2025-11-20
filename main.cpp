@@ -26,9 +26,10 @@ void spawnTower(int _x, int _y, int _type) {
             break;
         case 2:
             tower = gameObject(_x,_y,30,20,"Killdozer Tower",200);
+            tower.setMoveSpeed(0, 10);
             break;
         case 3:
-            tower = gameObject(_x,_y,25,25,"Cannon Tower",150);
+            tower = gameObject(_x,_y,40,40,"Cannon Tower",150);
             break;
     }
     // wycentrowanie
@@ -111,6 +112,7 @@ int main(int argc, char *argv[]) {
              cout << current_tower << endl;
          }
 
+
          // stawianie wieży w pozycji kursora
          if (e.type == SDL_MOUSEBUTTONDOWN) {
              // można stawiać tylko w lewej połowie ekranu
@@ -134,6 +136,7 @@ int main(int argc, char *argv[]) {
 
         for (auto& t : towers) {
             SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
+            t.update();
         }
 
         SDL_RenderPresent(renderer);

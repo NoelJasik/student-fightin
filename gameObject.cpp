@@ -4,6 +4,7 @@
 
 #include "gameObject.h"
 #include <string>
+#include <thread>
 
 gameObject::gameObject() {
     rect.x = 0;
@@ -12,6 +13,7 @@ gameObject::gameObject() {
     rect.h = 0;
     name = "default";
     hp = 100;
+    update();
 }
 gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp) {
         rect.x = _x;
@@ -20,6 +22,21 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
         rect.h = _h;
         name = _name;
         hp = _hp;
+        update();
+}
+
+void gameObject::moveBySpeed() {
+    rect.x += xSpeed;
+    rect.y += ySpeed;
+}
+
+void gameObject::setMoveSpeed(int _ySpeed, int _xSpeed) {
+    ySpeed = _ySpeed;
+    xSpeed = _xSpeed;
+}
+
+void gameObject::update() {
+   moveBySpeed();
 }
 
 
