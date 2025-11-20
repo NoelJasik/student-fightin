@@ -12,8 +12,7 @@ static int _HEIGHT = 720;
 
 void spawnTower(int x, int y, int type) {
     SDL_Rect tower;
-    tower.x = x;
-    tower.y = y;
+
     switch (type) {
         default:
             return;
@@ -30,7 +29,15 @@ void spawnTower(int x, int y, int type) {
             tower.h = 40;
             break;
     }
-    // można dodać różne typy wież w zależności od zmiennej type
+    // wycentrowanie
+    tower.x = x - tower.w / 2;
+    tower.y = y - tower.h / 2;
+    // clamp żeby w ekranie się zmieściło
+    if (tower.x < 0) tower.x = 0;
+    if (tower.y < 0) tower.y = 0;
+    if (tower.x + tower.w > _WIDTH) tower.x = _WIDTH - tower.w;
+    if (tower.y + tower.h > _HEIGHT) tower.y = _HEIGHT - tower.h;
+
     towers.push_back(tower);
 }
 
