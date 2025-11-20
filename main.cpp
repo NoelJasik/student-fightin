@@ -1,6 +1,8 @@
 #include <iostream>
 #include <SDL.h>
 #include <vector>
+#include "gameObject.h"
+
 
 using namespace std;
 
