@@ -43,7 +43,7 @@ Artstyle będzie wyglądał tak jakby gierka była narysowana odręcznie, na kar
 ### MVP:
 - [x] Ogarnięcie SDL2 i konfiguracja builda przez FetchContent / vcpkg
 - [ ] Rendering pipeline (SDL2 + OpenGL): prosty sprite renderer, kamera pokazująca całą planszę
-- [ ] Input & UI: przeciąganie i upuszczanie jednostek ograniczone do prawej połowy ekranu
+- [ ] Input & UI: przeciąganie i upuszczanie jednostek ograniczone do prawej połowy ekranu (Prototyp jest gotowy!)
 - [ ] Podstawowe jednostki: Student (melee), Koparka (ram/vehicle), Działko (ranged)
 - [ ] Prosta AI przeciwników: idą w lewo, wykrywają jednostki gracza i wchodzą w walkę
 - [ ] Spawner: generowanie przeciwników w czasie z prostym harmonogramem trudności
