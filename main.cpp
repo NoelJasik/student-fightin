@@ -6,7 +6,7 @@
 
 using namespace std;
 
-vector <SDL_Rect> towers;
+vector <gameObject> towers;
 
 // daje jako zmienne bo w obliczeniach się przyda
 static int _WIDTH = 1280;
@@ -15,33 +15,30 @@ static int _HEIGHT = 720;
 
 
 void spawnTower(int _x, int _y, int _type) {
-    SDL_Rect tower;
+    gameObject tower;
 
     // trzeba porobić klasy do wież
     switch (_type) {
         default:
             return;
         case 1:
-            tower.w = 20;
-            tower.h = 20;
+            tower = gameObject(_x,_y,20,30,"Infantry Tower",100);
             break;
         case 2:
-            tower.w = 30;
-            tower.h = 20;
+            tower = gameObject(_x,_y,30,20,"Killdozer Tower",200);
             break;
         case 3:
-            tower.w = 40;
-            tower.h = 40;
+            tower = gameObject(_x,_y,25,25,"Cannon Tower",150);
             break;
     }
     // wycentrowanie
-    tower.x = _x - tower.w / 2;
-    tower.y = _y - tower.h / 2;
+    tower.rect.x = _x - tower.rect.w / 2;
+    tower.rect.y = _y - tower.rect.h / 2;
     // clamp żeby w ekranie się zmieściło
-    if (tower.x < 0) tower.x = 0;
-    if (tower.y < 0) tower.y = 0;
-    if (tower.x + tower.w > _WIDTH) tower.x = _WIDTH - tower.w;
-    if (tower.y + tower.h > _HEIGHT) tower.y = _HEIGHT - tower.h;
+    if (tower.rect.x < 0) tower.rect.x = 0;
+    if (tower.rect.y < 0) tower.rect.y = 0;
+    if (tower.rect.x + tower.rect.w > _WIDTH) tower.rect.x = _WIDTH - tower.rect.w;
+    if (tower.rect.y + tower.rect.h > _HEIGHT) tower.rect.y = _HEIGHT - tower.rect.h;
 
     towers.push_back(tower);
 
@@ -136,7 +133,7 @@ int main(int argc, char *argv[]) {
 
 
         for (auto& t : towers) {
-            SDL_RenderCopy(renderer, tower_texture, nullptr, &t);
+            SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
         }
 
         SDL_RenderPresent(renderer);
