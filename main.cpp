@@ -10,28 +10,31 @@ vector <SDL_Rect> towers;
 static int _WIDTH = 1280;
 static int _HEIGHT = 720;
 
-void spawnTower(int x, int y, int type) {
+
+
+void spawnTower(int _x, int _y, int _type) {
     SDL_Rect tower;
 
-    switch (type) {
+    // trzeba porobić klasy do wież
+    switch (_type) {
         default:
             return;
         case 1:
             tower.w = 20;
             tower.h = 20;
             break;
-            case 2:
+        case 2:
             tower.w = 30;
             tower.h = 20;
             break;
-            case 3:
+        case 3:
             tower.w = 40;
             tower.h = 40;
             break;
     }
     // wycentrowanie
-    tower.x = x - tower.w / 2;
-    tower.y = y - tower.h / 2;
+    tower.x = _x - tower.w / 2;
+    tower.y = _y - tower.h / 2;
     // clamp żeby w ekranie się zmieściło
     if (tower.x < 0) tower.x = 0;
     if (tower.y < 0) tower.y = 0;
@@ -39,6 +42,7 @@ void spawnTower(int x, int y, int type) {
     if (tower.y + tower.h > _HEIGHT) tower.y = _HEIGHT - tower.h;
 
     towers.push_back(tower);
+
 }
 
 int main(int argc, char *argv[]) {
@@ -86,6 +90,9 @@ int main(int argc, char *argv[]) {
 
  while (running) {
      while (SDL_PollEvent(&e)) {
+
+         // -------------- input --------------
+
          if (e.type == SDL_QUIT) {
              running = false;
          }
@@ -119,6 +126,9 @@ int main(int argc, char *argv[]) {
              }
          }
      }
+
+     // -------------- render --------------
+
         SDL_RenderCopy(renderer, background_texture, nullptr, nullptr);
         SDL_RenderCopy(renderer, player_texture, nullptr, &player);
 
