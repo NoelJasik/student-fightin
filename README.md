@@ -21,7 +21,7 @@ OpenGL + SDL2 + CMake + C++
 - Ai kiboli działa tak, idą w lewo, dookoła każdego z nich jest niewidzalne kółko, jak w tym kółku wykryją jakąś postać od gracza to podchodzą i się z nim biją, jak nie to biegną w stronę agh
 - Budynek agh ma swoje hp, kibole go stopniowo ubijają, jak spadnie do zera to przegrywamy
 - Gra spawnuje kiboli losowo, musimy przeżyć np 5 minut (jeżeli będzie czas, zrobiłbym to na fale, tak jak w małpkach gdzie każda fala ma określonych przeciwników i ich układ a nie losowo)
-### mechanik (dodatkowe)
+### mechaniki (dodatkowe)
 - Rozgrywka na fale
   - pomiędzy falami można kupić/ulepszyć jednostki
   - każda fala ma inny układ przeciwników
