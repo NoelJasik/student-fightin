@@ -2,7 +2,7 @@
 #include <SDL.h>
 #include <vector>
 #include "gameObject.h"
-
+#include <cmath>
 
 using namespace std;
 
@@ -12,7 +12,15 @@ vector <gameObject> towers;
 static int _WIDTH = 1280;
 static int _HEIGHT = 720;
 
+float isColliding(gameObject obj1, gameObject obj2) {
+    //obj 1 to objekt isniejacy, obj2 jeszcze nieistniejacy
+    float dx = obj1.rect.x - obj2.rect.x;
+    float dy = obj1.rect.y - obj2.rect.y;
+    float distance = sqrt(dx*dx + dy*dy);
+    return distance;
 
+
+}
 
 void spawnTower(int _x, int _y, int _type) {
     gameObject tower;
@@ -117,7 +125,27 @@ int main(int argc, char *argv[]) {
          if (e.type == SDL_MOUSEBUTTONDOWN) {
              // można stawiać tylko w lewej połowie ekranu
              if (e.button.button == SDL_BUTTON_LEFT && e.button.x <= _WIDTH / 2) {
-                 spawnTower(e.button.x , e.button.y, current_tower);
+                 bool can_place=true;
+                 float distance=0;
+                 int towers_quantity=towers.size();
+                 for (int i=0; i<towers_quantity; i++) {
+                        if (current_tower==1) {
+                            distance=isColliding(towers[i], gameObject(e.button.x,e.button.y,20,30,"Infantry Tower",100));
+                            if (distance<50) {
+                                can_place=false;
+                            }
+                        }else if (current_tower==3) {
+                            distance=isColliding(towers[i], gameObject(e.button.x,e.button.y,40,40,"Cannon Tower",150));
+                            if (distance<70){
+                                can_place=false;
+                            }
+                        }
+                 }
+                 if(can_place==true) {
+                     spawnTower(e.button.x , e.button.y, current_tower);
+                 }else {
+                     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Błąd", "Nie możesz postawić tutaj jednostki znajduje się ona zbyt blisko innej, spróbuj gdzie indziej.",NULL);
+                 }
              }
          }
          // wychodzenie z gry
