@@ -16,7 +16,9 @@ FetchContent_MakeAvailable(SDL2)
 
 add_executable(uniProject main.cpp
         gameObject.cpp
-        gameObject.h)
+        gameObject.h
+        klasy/button.cpp
+        klasy/button.h) # obiera buttona
 
 target_link_libraries(uniProject PRIVATE SDL2::SDL2main SDL2::SDL2-static)
 
