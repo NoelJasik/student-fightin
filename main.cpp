@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include <vector>
 #include "gameObject.h"
+#include "klasy/button.h"
 
 
 using namespace std;
@@ -11,7 +12,6 @@ vector <gameObject> towers;
 // daje jako zmienne bo w obliczeniach się przyda
 static int _WIDTH = 1280;
 static int _HEIGHT = 720;
-
 
 
 void spawnTower(int _x, int _y, int _type) {
@@ -88,6 +88,8 @@ int main(int argc, char *argv[]) {
     SDL_SetRenderTarget(renderer, nullptr);
 
 
+    Button uiButton; // renderuje przycisk
+
  while (running) {
      while (SDL_PollEvent(&e)) {
 
@@ -126,6 +128,8 @@ int main(int argc, char *argv[]) {
                  running = false;
              }
          }
+         // robi update renderu przycisku
+         uiButton.update(renderer, e, current_tower);
      }
 
      // -------------- render --------------
@@ -140,9 +144,13 @@ int main(int argc, char *argv[]) {
             t.update();
         }
 
+        // rysuje przycisk
+        SDL_Event drawEvent{};
+        uiButton.update(renderer, drawEvent, current_tower);
+
         SDL_RenderPresent(renderer);
         SDL_Delay(10);
-    }
+     }
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
