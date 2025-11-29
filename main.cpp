@@ -110,6 +110,8 @@ int main(int argc, char *argv[]) {
                  case SDLK_3:
                      current_tower = 3;
                      break;
+                 case SDLK_0:
+                     current_tower = 0;
              }
              cout << current_tower << endl;
          }
