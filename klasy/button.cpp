@@ -17,9 +17,9 @@ void Button::update(SDL_Renderer *renderer, const SDL_Event& e, int& current_tow
 
         current_tower = 1; //wybiera wieżę
     }
-    SDL_Rect buttonRect1 = {50, 50, 50, 50}; //  a to rysuje przycisk
+    SDL_Rect buttonRect = {50, 50, 50, 50}; //  a to rysuje przycisk
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_RenderFillRect(renderer, &buttonRect1);
+    SDL_RenderFillRect(renderer, &buttonRect);
 
     if (e.type == SDL_MOUSEBUTTONDOWN &&
         e.button.button == SDL_BUTTON_LEFT &&
@@ -28,9 +28,9 @@ void Button::update(SDL_Renderer *renderer, const SDL_Event& e, int& current_tow
 
         current_tower = 2;
         }
-    SDL_Rect buttonRect2 = {125, 50, 50, 50};
+    buttonRect = {125, 50, 50, 50};
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_RenderFillRect(renderer, &buttonRect2);
+    SDL_RenderFillRect(renderer, &buttonRect);
 
     if (e.type == SDL_MOUSEBUTTONDOWN &&
         e.button.button == SDL_BUTTON_LEFT &&
@@ -39,8 +39,8 @@ void Button::update(SDL_Renderer *renderer, const SDL_Event& e, int& current_tow
 
         current_tower = 3;
         }
-    SDL_Rect buttonRect3 = { 200, 50, 50, 50};
+    buttonRect = { 200, 50, 50, 50};
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_RenderFillRect(renderer, &buttonRect3);
+    SDL_RenderFillRect(renderer, &buttonRect);
 
 }
