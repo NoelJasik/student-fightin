@@ -3,7 +3,7 @@
 #include <vector>
 #include "gameObject.h"
 #include "klasy/button.h"
-
+#include "math.h"
 
 using namespace std;
 
@@ -12,7 +12,12 @@ vector <gameObject> towers;
 // daje jako zmienne bo w obliczeniach się przyda
 static int _WIDTH = 1280;
 static int _HEIGHT = 720;
+//oblicza dystans pomiedzy 2 jednostkami Mateusz 16.12
+double CalcualteDistance(gameObject obj1, gameObject obj2) {
+    double distance = sqrt(pow(obj1.rect.x-obj2.rect.x, 2) + pow(obj1.rect.y-obj2.rect.y, 2));
+    return distance;
 
+}
 
 void spawnTower(int _x, int _y, int _type) {
     gameObject tower;
@@ -121,7 +126,31 @@ int main(int argc, char *argv[]) {
          if (e.type == SDL_MOUSEBUTTONDOWN) {
              // można stawiać tylko w lewej połowie ekranu
              if (e.button.button == SDL_BUTTON_LEFT && e.button.x <= _WIDTH / 2) {
-                 spawnTower(e.button.x , e.button.y, current_tower);
+                 //zapobieganie kolizji jednostek Mateusz 16.12
+                 double distance=0;// zmienne do przechowywania dystansu i czy jednsotka moze byc postawiona
+                 float can_be_placed=true;
+                 if (current_tower==1) {
+                     for (int i=0; i<towers.size(); i++) {
+                         distance=CalcualteDistance(towers[i], gameObject(e.button.x,e.button.y,20,30,"Infantry Tower",100));
+                         if (distance<45) {
+                             can_be_placed=false;
+                             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
+                             break;
+                         }
+                     }
+                 }else if (current_tower==3) {
+                     for (int i=0; i<towers.size(); i++) {
+                         distance=CalcualteDistance(towers[i], gameObject(e.button.x,e.button.y,20,30,"Infantry Tower",100));
+                         if (distance<65) {
+                             can_be_placed=false;
+                             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
+                             break;
+                         }
+                     }
+                 }
+                 if (can_be_placed==true) {
+                     spawnTower(e.button.x,e.button.y,current_tower);
+                 }
              }
          }
          // wychodzenie z gry
