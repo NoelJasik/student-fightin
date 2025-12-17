@@ -11,9 +11,13 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
         GIT_TAG release-2.30.5
 )
-
-FetchContent_MakeAvailable(SDL2)
-
+    FetchContent_Declare(
+            SDL2_image
+            GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
+            GIT_TAG release-2.8.8
+    )
+    FetchContent_MakeAvailable(SDL2)
+    FetchContent_MakeAvailable(SDL2_image)
 add_executable(uniProject main.cpp
         gameObject.cpp
         gameObject.h
@@ -24,4 +28,5 @@ target_link_libraries(uniProject PRIVATE SDL2::SDL2main SDL2::SDL2-static) #Jak 
 
 target_include_directories(uniProject PRIVATE
         ${sdl2_SOURCE_DIR}/include
+        ${SDL2_image_SOURCE_DIR}/include
 )

@@ -4,7 +4,7 @@
 #include "gameObject.h"
 #include "klasy/button.h"
 #include "math.h"
-
+#include <SDL_image.h>
 using namespace std;
 
 vector <gameObject> towers;
