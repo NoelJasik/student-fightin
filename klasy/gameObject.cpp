@@ -2,9 +2,10 @@
 // Created by starflea on 11/20/25.
 //
 
-#include "gameObject.h"
+#include "../headers/gameObject.h"
 #include <string>
 #include <thread>
+
 
 gameObject::gameObject() {
     rect.x = 0;

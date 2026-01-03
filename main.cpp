@@ -1,10 +1,11 @@
 #include <iostream>
 #include <SDL.h>
 #include <vector>
-#include "gameObject.h"
-#include "klasy/button.h"
+#include "headers/gameObject.h"
+#include "headers/button.h"
 #include "math.h"
-#include <SDL_image.h>
+#include "SDL_image.h"
+
 using namespace std;
 
 vector <gameObject> towers;
