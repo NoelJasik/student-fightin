@@ -4,11 +4,15 @@
 #include "headers/gameObject.h"
 #include "headers/button.h"
 #include "math.h"
-#include "SDL_image.h"
+#include <SDL_image.h>
 
 using namespace std;
 
 vector <gameObject> towers;
+
+// ------ GRAFIKI ------
+SDL_Surface* background_surface = IMG_Load("assets/bg.jpg");
+
 
 // daje jako zmienne bo w obliczeniach się przyda
 static int _WIDTH = 1280;
@@ -70,9 +74,28 @@ int main(int argc, char *argv[]) {
 
 
     SDL_CreateWindowAndRenderer(_WIDTH, _HEIGHT, 0, &window, &renderer);
-    //placeholder na teksture w tle
-    auto background_texture =
-            SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1280, 720);
+
+   // Dałem statyczne, bo to jest tło
+    auto background_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, _WIDTH, _HEIGHT);
+
+   // Wczytywanie tła (to można było by przerobić na funkcje
+    if (!background_surface) {
+        cout << "IMG_Load error: " << IMG_GetError() << endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+    background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+    SDL_FreeSurface(background_surface);
+    if (!background_texture) {
+        cout << "SDL_CreateTextureFromSurface error: " << SDL_GetError() << endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+
     //placeholder na teksture kursora
     auto player_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 10, 20);
     //placeholder na teksture wiezy
