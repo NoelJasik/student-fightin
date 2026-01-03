@@ -1,32 +1,75 @@
-cmake_minimum_required(VERSION 3.15)
-project(uniProject LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.24) # Nowsza wersja, lepiej powinno śmigać
+
+
+project(uniProject VERSION 0.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# --- 1. Konfiguracja statycznego buildu ---
+# Trzeba to zrobić przed FetchContent_Declare, zmusza to SDL żeby skompilował się statycznie na pliki, dzięki temu nie trzeba DLL'sów jak się skompiluje
+
+option(SDL_SHARED "Build shared SDL" OFF)
+option(SDL_STATIC "Build static SDL" ON)
+option(SDL2_DISABLE_INSTALL "Disable installing SDL2" ON)
+
+# Zmuszamy SDL'a do skompilowania statycznie
+option(SDL2_IMAGE_BUILD_SHARED_LIBS "Build shared SDL2_image" OFF)
+option(SDL2_IMAGE_BUILD_TESTS "Build SDL2_image tests" OFF) # Speeds up build
 
 include(FetchContent)
 
-# Teraz SDL2 pobiera się z automatu
+# --- 2. Pobieranie dependencies (ja zawsze talk pół polish pół english ---
+# SDL2 (Core)
 FetchContent_Declare(
         SDL2
         GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-        GIT_TAG release-2.30.5
+        GIT_TAG        release-2.30.5
 )
-    FetchContent_Declare(
-            SDL2_image
-            GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
-            GIT_TAG release-2.8.8
-    )
-    FetchContent_MakeAvailable(SDL2)
-    FetchContent_MakeAvailable(SDL2_image)
-add_executable(uniProject main.cpp
-        gameObject.cpp
-        gameObject.h
+
+# SDL2_image (Extension)
+FetchContent_Declare(
+        SDL2_image
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
+        GIT_TAG        release-2.8.8
+)
+
+FetchContent_MakeAvailable(SDL2 SDL2_image)
+
+# --- 3. dodajemy do exe (JAK STWORZYCIE NOWE KLASY/HEADERY TO TU TRZEBA DODAĆ) ---
+add_executable(uniProject
+        main.cpp
+        klasy/gameObject.cpp
+        headers/gameObject.h
         klasy/button.cpp
-        klasy/button.h) # obiera buttona
-
-target_link_libraries(uniProject PRIVATE SDL2::SDL2main SDL2::SDL2-static) #Jak coś tego nie dotykać bo sie wszystko rozwali z jakiegoś powodu xD
-
-target_include_directories(uniProject PRIVATE
-        ${sdl2_SOURCE_DIR}/include
-        ${SDL2_image_SOURCE_DIR}/include
+        headers/button.h
 )
+
+# --- 4. Dodajemy ścieżki do naszych bibliotek (mam nadzieje że windows to zrozumie) ---
+# Dzięki temu można pisać #include "button.h"
+# zamiast "../headeary/button.h"
+# Ale nwm czy to na windowsie będzie działać to narazie nie zmieniam
+target_include_directories(uniProject PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/headers
+)
+
+# --- 5. Podłączamy biblioteki ---
+target_link_libraries(uniProject PRIVATE
+        # używamy statycznych blibliotek
+        SDL2_image::SDL2_image-static
+        SDL2::SDL2-static
+
+        # Z dedykacją dla winowsa :D
+        # Na systemach opartych na unixie nie powinno nic zmieniać
+        SDL2::SDL2main
+)
+
+# --- 6. Kompilacja assetów ---
+# Dodajemy folder assets żeby był zawarty w pliku exe, audio też by tu trzeba było dodać
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+    add_custom_command(TARGET uniProject POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+            "$<TARGET_FILE_DIR:uniProject>/assets"
+    )
+endif()

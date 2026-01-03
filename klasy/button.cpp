@@ -2,7 +2,7 @@
 // Created by Dawid Roś on 25/11/2025.
 //
 #include <SDL.h>
-#include "button.h"
+#include "../headers/button.h"
 
 
 Button::Button() = default; // chuj wie co to robi ale działa

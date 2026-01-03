@@ -1,13 +1,18 @@
 #include <iostream>
 #include <SDL.h>
 #include <vector>
-#include "gameObject.h"
-#include "klasy/button.h"
+#include "headers/gameObject.h"
+#include "headers/button.h"
 #include "math.h"
 #include <SDL_image.h>
+
 using namespace std;
 
 vector <gameObject> towers;
+
+// ------ GRAFIKI ------
+SDL_Surface* background_surface = IMG_Load("assets/bg.jpg");
+
 
 // daje jako zmienne bo w obliczeniach się przyda
 static int _WIDTH = 1280;
@@ -27,14 +32,14 @@ void spawnTower(int _x, int _y, int _type) {
         default:
             return;
         case 1:
-            tower = gameObject(_x,_y,20,30,"Infantry Tower",100);
+            tower = gameObject(_x,_y,50,90,"Infantry Tower",100);
             break;
         case 2:
-            tower = gameObject(_x,_y,30,20,"Killdozer Tower",200);
+            tower = gameObject(_x,_y,100,200,"Killdozer Tower",200);
             tower.setMoveSpeed(0, 10);
             break;
         case 3:
-            tower = gameObject(_x,_y,40,40,"Cannon Tower",150);
+            tower = gameObject(_x,_y,100,100,"Cannon Tower",150);
             break;
     }
     // wycentrowanie
@@ -69,22 +74,61 @@ int main(int argc, char *argv[]) {
 
 
     SDL_CreateWindowAndRenderer(_WIDTH, _HEIGHT, 0, &window, &renderer);
-    //placeholder na teksture w tle
-    auto background_texture =
-            SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1280, 720);
-    //placeholder na teksture kursora
-    auto player_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 10, 20);
-    //placeholder na teksture wiezy
-    auto tower_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 10, 20);
+
+   // Dałem statyczne, bo to jest tło
+    auto background_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, _WIDTH, _HEIGHT);
+
+   // Wczytywanie tła (to można było by przerobić na funkcje)
+    if (!background_surface) {
+        cout << "IMG_Load error: " << IMG_GetError() << endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+    background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+    SDL_FreeSurface(background_surface);
+    if (!background_texture) {
+        cout << "SDL_CreateTextureFromSurface error: " << SDL_GetError() << endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+
+    // Wykorzystajmy (narazie, jak będzie czas to zmienimy) kursor systemowy. Jako inżynier trzeba korzystać z praktycznych rozwiązań i rozwiązywać praktyczne problemy, kursor to problem już dawno rozwiązany
+    // auto player_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 10, 20);    SDL_Surface* player_surface = IMG_Load("assets/aghUnit.png");
+
+    auto tower_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 2709, 6468);
+    SDL_Surface* tower_surface = IMG_Load("assets/aghUnit.png");
+    if (!tower_surface) {
+        cout << "IMG_Load error: " << IMG_GetError() << endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+    tower_texture = SDL_CreateTextureFromSurface(renderer, tower_surface);
+    SDL_FreeSurface(tower_surface);
+    if (!tower_texture) {
+        cout << "SDL_CreateTextureFromSurface error: " << SDL_GetError() << endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+
+
+
 
 
     SDL_SetRenderTarget(renderer, background_texture);
     SDL_SetRenderDrawColor(renderer, 51, 102, 0, 255);
     SDL_RenderClear(renderer);
 
-    SDL_SetRenderTarget(renderer, player_texture);
-    SDL_SetRenderDrawColor(renderer, 204, 102, 0, 255);
-    SDL_RenderClear(renderer);
+    // SDL_SetRenderTarget(renderer, player_texture);
+    // SDL_SetRenderDrawColor(renderer, 204, 102, 0, 255);
+    // SDL_RenderClear(renderer);
 
     SDL_SetRenderTarget(renderer, tower_texture);
     SDL_SetRenderDrawColor(renderer, 204, 102, 0, 255);
@@ -134,7 +178,8 @@ int main(int argc, char *argv[]) {
                          distance=CalcualteDistance(towers[i], gameObject(e.button.x,e.button.y,20,30,"Infantry Tower",100));
                          if (distance<45) {
                              can_be_placed=false;
-                             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
+                             // to jest zjebane, bo psuje gameplay zatrzymując całą grę
+                             // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
                              break;
                          }
                      }
@@ -143,7 +188,8 @@ int main(int argc, char *argv[]) {
                          distance=CalcualteDistance(towers[i], gameObject(e.button.x,e.button.y,20,30,"Infantry Tower",100));
                          if (distance<65) {
                              can_be_placed=false;
-                             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
+                             // to jest zjebane, bo psuje gameplay zatrzymując całą grę
+                             // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
                              break;
                          }
                      }
@@ -166,7 +212,7 @@ int main(int argc, char *argv[]) {
      // -------------- render --------------
 
         SDL_RenderCopy(renderer, background_texture, nullptr, nullptr);
-        SDL_RenderCopy(renderer, player_texture, nullptr, &player);
+        // SDL_RenderCopy(renderer, player_texture, nullptr, &player);
 
 
         for (auto& t : towers) {
