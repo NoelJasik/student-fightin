@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.24) # Nowsza wersja, lepiej powinno śmigać
 
 
+
 project(uniProject VERSION 0.0.1 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # --- 1. Konfiguracja statycznego buildu ---
@@ -26,15 +27,20 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
         GIT_TAG        release-2.30.5
 )
-
+FetchContent_MakeAvailable(SDL2)
 # SDL2_image (Extension)
 FetchContent_Declare(
         SDL2_image
         GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
         GIT_TAG        release-2.8.8
 )
+#
+# START ADDITION
+set(SDL2IMAGE_INSTALL OFF)
+set(BUILD_SHARED_LIBS FALSE)
+# END ADDITION
 
-FetchContent_MakeAvailable(SDL2 SDL2_image)
+FetchContent_MakeAvailable(SDL2_image)
 
 # --- 3. dodajemy do exe (JAK STWORZYCIE NOWE KLASY/HEADERY TO TU TRZEBA DODAĆ) ---
 add_executable(uniProject
