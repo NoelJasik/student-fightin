@@ -32,14 +32,14 @@ void spawnTower(int _x, int _y, int _type) {
         default:
             return;
         case 1:
-            tower = gameObject(_x,_y,20,30,"Infantry Tower",100);
+            tower = gameObject(_x,_y,50,90,"Infantry Tower",100);
             break;
         case 2:
-            tower = gameObject(_x,_y,30,20,"Killdozer Tower",200);
+            tower = gameObject(_x,_y,100,200,"Killdozer Tower",200);
             tower.setMoveSpeed(0, 10);
             break;
         case 3:
-            tower = gameObject(_x,_y,40,40,"Cannon Tower",150);
+            tower = gameObject(_x,_y,100,100,"Cannon Tower",150);
             break;
     }
     // wycentrowanie
