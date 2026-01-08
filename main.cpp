@@ -5,6 +5,7 @@
 #include "headers/button.h"
 #include "math.h"
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 
 using namespace std;
 
@@ -61,6 +62,16 @@ int main(int argc, char *argv[]) {
         cout << "SDL_Init error: " << SDL_GetError() << endl;
         return 1;
     }
+
+    if (TTF_Init() == -1) { // inicjalizacja sld2_ttf dawid
+        SDL_Log("TTF_Init error: %s", TTF_GetError());
+    }
+    TTF_Font* font = TTF_OpenFont("assets/GravitasOne-Regular.ttf", 64); // pobieranie fonta
+    if (!font) {
+        SDL_Log("Font error: %s", TTF_GetError());
+    }
+
+
 
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
@@ -136,6 +147,16 @@ int main(int argc, char *argv[]) {
 
     SDL_SetRenderTarget(renderer, nullptr);
 
+
+    SDL_Color textColor = {200, 23, 20, 255}; // ogarnianie aby to działało( dawid )w sensie ta czcionka i ten cały ttf
+    SDL_Surface* textSurface = TTF_RenderText_Solid(font, "$000", textColor);
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_Rect textRect;
+    textRect.w = textSurface->w;
+    textRect.h = textSurface->h;
+    textRect.x = _WIDTH - textRect.w;
+    textRect.y = 0;
+    SDL_FreeSurface(textSurface);
 
     Button uiButton; // renderuje przycisk
 
@@ -225,12 +246,16 @@ int main(int argc, char *argv[]) {
         SDL_Event drawEvent{};
         uiButton.update(renderer, drawEvent, current_tower);
 
+        SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
         SDL_RenderPresent(renderer);
         SDL_Delay(10);
      }
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    SDL_DestroyTexture(textTexture);
+    TTF_CloseFont(font);
+    TTF_Quit();
     SDL_Quit();
 
 

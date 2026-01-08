@@ -34,6 +34,14 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
         GIT_TAG        release-2.8.8
 )
+
+FetchContent_Declare( # to coś pobiera z gita ttf czyli do renderowania napisów (dawid)
+        SDL2_ttf
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
+        GIT_TAG release-2.24.0 #MUSI BYć WERSJA Z 2 NA POCZĄTKU
+)
+
+FetchContent_MakeAvailable(SDL2_ttf)
 #
 # START ADDITION
 set(SDL2IMAGE_INSTALL OFF)
@@ -64,7 +72,7 @@ target_link_libraries(uniProject PRIVATE
         # używamy statycznych blibliotek
         SDL2_image::SDL2_image-static
         SDL2::SDL2-static
-
+        SDL2_ttf::SDL2_ttf-static #(dawid) zajęło mi to w mega za długo
         # Z dedykacją dla winowsa :D
         # Na systemach opartych na unixie nie powinno nic zmieniać
         SDL2::SDL2main
