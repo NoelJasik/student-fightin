@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.24) # Nowsza wersja, lepiej powinno śmigać
 
 
 
-project(uniProject VERSION 0.0.1 LANGUAGES CXX)
+
+project(uniproject VERSION 0.0.1 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,6 +18,11 @@ option(SDL2_DISABLE_INSTALL "Disable installing SDL2" ON)
 # Zmuszamy SDL'a do skompilowania statycznie
 option(SDL2_IMAGE_BUILD_SHARED_LIBS "Build shared SDL2_image" OFF)
 option(SDL2_IMAGE_BUILD_TESTS "Build SDL2_image tests" OFF) # Speeds up build
+
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libs" FORCE)
+set(SDL2_SHARED OFF CACHE BOOL "Link SDL2 shared" FORCE)
+set(SDL2_IMAGE_SHARED OFF CACHE BOOL "Link SDL2_image shared" FORCE)
+set(SDL2_TTF_SHARED OFF CACHE BOOL "Link SDL2_ttf shared" FORCE)
 
 include(FetchContent)
 
@@ -40,7 +46,7 @@ FetchContent_Declare( # to coś pobiera z gita ttf czyli do renderowania napisó
         GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
         GIT_TAG release-2.24.0 #MUSI BYć WERSJA Z 2 NA POCZĄTKU
 )
-
+set(SDL2TTF_VENDORED ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(SDL2_ttf)
 #
 # START ADDITION
@@ -72,7 +78,7 @@ target_link_libraries(uniProject PRIVATE
         # używamy statycznych blibliotek
         SDL2_image::SDL2_image-static
         SDL2::SDL2-static
-        SDL2_ttf::SDL2_ttf-static #(dawid) zajęło mi to w mega za długo
+        SDL2_ttf::SDL2_ttf-static
         # Z dedykacją dla winowsa :D
         # Na systemach opartych na unixie nie powinno nic zmieniać
         SDL2::SDL2main
