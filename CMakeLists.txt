@@ -57,6 +57,8 @@ add_executable(uniProject
         headers/gameObject.h
         klasy/button.cpp
         headers/button.h
+        klasy/notification.cpp
+        headers/notification.h
 )
 
 # --- 4. Dodajemy ścieżki do naszych bibliotek (mam nadzieje że windows to zrozumie) ---
