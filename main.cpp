@@ -3,6 +3,7 @@
 #include <vector>
 #include "headers/gameObject.h"
 #include "headers/button.h"
+#include "headers/notification.h"
 #include "math.h"
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -159,8 +160,9 @@ int main(int argc, char *argv[]) {
     SDL_FreeSurface(textSurface);
 
     Button uiButton; // renderuje przycisk
-
+    NotificationManager notification_manager(renderer,font);
  while (running) {
+
      while (SDL_PollEvent(&e)) {
 
          // -------------- input --------------
@@ -217,6 +219,7 @@ int main(int argc, char *argv[]) {
                  }
                  if (can_be_placed==true) {
                      spawnTower(e.button.x,e.button.y,current_tower);
+                     notification_manager.add("test");
                  }
              }
          }
@@ -228,19 +231,21 @@ int main(int argc, char *argv[]) {
          }
          // robi update renderu przycisku
          uiButton.update(renderer, e, current_tower);
+
      }
 
      // -------------- render --------------
 
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background_texture, nullptr, nullptr);
-        // SDL_RenderCopy(renderer, player_texture, nullptr, &player);
-
-
         for (auto& t : towers) {
-            SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
-            // to trzeba zrobić matematycznie żeby działało niezależnie od fps
-            t.update();
+         SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
+         t.update();
         }
+        notification_manager.render(window);
+        notification_manager.update();
+        // SDL_RenderCopy(renderer, player_texture, nullptr, &player);
 
         // rysuje przycisk
         SDL_Event drawEvent{};
@@ -249,8 +254,8 @@ int main(int argc, char *argv[]) {
         SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
         SDL_RenderPresent(renderer);
         SDL_Delay(10);
-     }
 
+     }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_DestroyTexture(textTexture);
