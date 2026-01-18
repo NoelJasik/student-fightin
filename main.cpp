@@ -10,21 +10,16 @@
 
 using namespace std;
 
-vector <gameObject> towers;
+vector<gameObject> towers;
 
 // ------ GRAFIKI ------
-SDL_Surface* background_surface = IMG_Load("assets/bg.jpg");
+SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
 
 
 // daje jako zmienne bo w obliczeniach się przyda
 static int _WIDTH = 1280;
 static int _HEIGHT = 720;
-//oblicza dystans pomiedzy 2 jednostkami Mateusz 16.12
-double CalcualteDistance(gameObject obj1, gameObject obj2) {
-    double distance = sqrt(pow(obj1.rect.x-obj2.rect.x, 2) + pow(obj1.rect.y-obj2.rect.y, 2));
-    return distance;
 
-}
 
 void spawnTower(int _x, int _y, int _type) {
     gameObject tower;
@@ -34,14 +29,14 @@ void spawnTower(int _x, int _y, int _type) {
         default:
             return;
         case 1:
-            tower = gameObject(_x,_y,50,90,"Infantry Tower",100);
+            tower = gameObject(_x, _y, 50, 90, "Infantry Tower", 100);
             break;
         case 2:
-            tower = gameObject(_x,_y,100,200,"Killdozer Tower",200);
+            tower = gameObject(_x, _y, 100, 200, "Killdozer Tower", 200);
             tower.setMoveSpeed(0, 10);
             break;
         case 3:
-            tower = gameObject(_x,_y,100,100,"Cannon Tower",150);
+            tower = gameObject(_x, _y, 100, 100, "Cannon Tower", 150);
             break;
     }
     // wycentrowanie
@@ -54,7 +49,6 @@ void spawnTower(int _x, int _y, int _type) {
     if (tower.rect.y + tower.rect.h > _HEIGHT) tower.rect.y = _HEIGHT - tower.rect.h;
 
     towers.push_back(tower);
-
 }
 
 int main(int argc, char *argv[]) {
@@ -64,7 +58,8 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    if (TTF_Init() == -1) { // inicjalizacja sld2_ttf dawid
+    if (TTF_Init() == -1) {
+        // inicjalizacja sld2_ttf dawid
         SDL_Log("TTF_Init error: %s", TTF_GetError());
     }
     TTF_Font* font = TTF_OpenFont("assets/PlaywriteCU-Regular.ttf", 32); // pobieranie fonta
@@ -72,7 +67,6 @@ int main(int argc, char *argv[]) {
     if (!font) {
         SDL_Log("Font error: %s", TTF_GetError());
     }
-
 
 
     SDL_Window *window = nullptr;
@@ -85,13 +79,13 @@ int main(int argc, char *argv[]) {
     int current_tower = 0;
 
 
-
     SDL_CreateWindowAndRenderer(_WIDTH, _HEIGHT, 0, &window, &renderer);
 
-   // Dałem statyczne, bo to jest tło
-    auto background_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, _WIDTH, _HEIGHT);
+    // Dałem statyczne, bo to jest tło
+    auto background_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, _WIDTH,
+                                                _HEIGHT);
 
-   // Wczytywanie tła (to można było by przerobić na funkcje)
+    // Wczytywanie tła (to można było by przerobić na funkcje)
     if (!background_surface) {
         cout << "IMG_Load error: " << IMG_GetError() << endl;
         SDL_DestroyRenderer(renderer);
@@ -113,7 +107,7 @@ int main(int argc, char *argv[]) {
     // auto player_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 10, 20);    SDL_Surface* player_surface = IMG_Load("assets/aghUnit.png");
 
     auto tower_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 2709, 6468);
-    SDL_Surface* tower_surface = IMG_Load("assets/aghUnit.png");
+    SDL_Surface *tower_surface = IMG_Load("assets/aghUnit.png");
     if (!tower_surface) {
         cout << "IMG_Load error: " << IMG_GetError() << endl;
         SDL_DestroyRenderer(renderer);
@@ -132,9 +126,6 @@ int main(int argc, char *argv[]) {
     }
 
 
-
-
-
     SDL_SetRenderTarget(renderer, background_texture);
     SDL_SetRenderDrawColor(renderer, 51, 102, 0, 255);
     SDL_RenderClear(renderer);
@@ -151,8 +142,8 @@ int main(int argc, char *argv[]) {
 
 
     SDL_Color textColor = {200, 23, 20, 255}; // ogarnianie aby to działało( dawid )w sensie ta czcionka i ten cały ttf
-    SDL_Surface* textSurface = TTF_RenderText_Solid(font, "$000", textColor);
-    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_Surface *textSurface = TTF_RenderText_Solid(font, "$000", textColor);
+    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
     SDL_Rect textRect;
     textRect.w = textSurface->w;
     textRect.h = textSurface->h;
@@ -166,75 +157,93 @@ int main(int argc, char *argv[]) {
 
      while (SDL_PollEvent(&e)) {
 
-         // -------------- input --------------
-
-         if (e.type == SDL_QUIT) {
-             running = false;
-         }
+            if (e.type == SDL_QUIT) {
+                running = false;
+            }
             // wybór typu wieży
-         if (e.type == SDL_KEYDOWN) {
-             switch (e.key.keysym.sym) {
-                 case SDLK_1:
-                     current_tower = 1;
-                     break;
-                 case SDLK_2:
-                     current_tower = 2;
-                     break;
-                 case SDLK_3:
-                     current_tower = 3;
-                     break;
-                 case SDLK_0:
-                     current_tower = 0;
-             }
-             cout << current_tower << endl;
-         }
+            if (e.type == SDL_KEYDOWN) {
+                switch (e.key.keysym.sym) {
+                    case SDLK_1:
+                        current_tower = 1;
+                        break;
+                    case SDLK_2:
+                        current_tower = 2;
+                        break;
+                    case SDLK_3:
+                        current_tower = 3;
+                        break;
+                    case SDLK_0:
+                        current_tower = 0;
+                }
+                // cout << current_tower << endl;
+            }
 
 
-         // stawianie wieży w pozycji kursora
-         if (e.type == SDL_MOUSEBUTTONDOWN) {
-             // można stawiać tylko w lewej połowie ekranu
-             if (e.button.button == SDL_BUTTON_LEFT && e.button.x <= _WIDTH / 2) {
-                 //zapobieganie kolizji jednostek Mateusz 16.12
-                 double distance=0;// zmienne do przechowywania dystansu i czy jednsotka moze byc postawiona
-                 float can_be_placed=true;
-                 if (current_tower==1) {
-                     for (int i=0; i<towers.size(); i++) {
-                         distance=CalcualteDistance(towers[i], gameObject(e.button.x,e.button.y,20,30,"Infantry Tower",100));
-                         if (distance<45) {
-                             can_be_placed=false;
-                             // to jest zjebane, bo psuje gameplay zatrzymując całą grę
-                             // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
-                             break;
-                         }
-                     }
-                 }else if (current_tower==3) {
-                     for (int i=0; i<towers.size(); i++) {
-                         distance=CalcualteDistance(towers[i], gameObject(e.button.x,e.button.y,20,30,"Infantry Tower",100));
-                         if (distance<65) {
-                             can_be_placed=false;
-                             // to jest zjebane, bo psuje gameplay zatrzymując całą grę
-                             // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
-                             break;
-                         }
-                     }
-                 }
-                 if (can_be_placed==true) {
-                     spawnTower(e.button.x,e.button.y,current_tower);
-                 }
-             }
-         }
-         // wychodzenie z gry
-         if (e.type == SDL_KEYDOWN) {
-             if (e.key.keysym.sym == SDLK_ESCAPE) {
-                 running = false;
-             }
-         }
-         // robi update renderu przycisku
-         uiButton.update(renderer, e, current_tower);
+            // stawianie wieży w pozycji kursora
+            if (e.type == SDL_MOUSEBUTTONDOWN) {
+                // można stawiać tylko w lewej połowie ekranu
+                if (e.button.button == SDL_BUTTON_LEFT && e.button.x <= _WIDTH / 2) {
+                    //zapobieganie kolizji jednostek Mateusz 16.12
+                    double distance = 0; // zmienne do przechowywania dystansu i czy jednsotka moze byc postawiona
+                    float can_be_placed = true;
+                    if (current_tower == 1) {
+                        for (int i = 0; i < towers.size(); i++) {
+                            distance = gameObject::calculateDistance(
+                                towers[i], gameObject(e.button.x, e.button.y, 20, 30, "Infantry Tower", 100));
+                            // cout << "Distance: " << distance << " [i]" << i << endl;
+                            if (distance < 45) {
+                                can_be_placed = false;
+                                // to jest zjebane, bo psuje gameplay zatrzymując całą grę
+                                // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
+                                break;
+                            }
+                        }
+                    } else if (current_tower == 3) {
+                        for (int i = 0; i < towers.size(); i++) {
+                            distance = gameObject::calculateDistance(
+                                towers[i], gameObject(e.button.x, e.button.y, 20, 30, "Infantry Tower", 100));
+                            if (distance < 65) {
+                                can_be_placed = false;
+                                // to jest zjebane, bo psuje gameplay zatrzymując całą grę
+                                // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
+                                break;
+                            }
+                        }
+                    }
+                    if (can_be_placed == true) {
+                        spawnTower(e.button.x, e.button.y, current_tower);
+                    }
+                }
+            }
+            // sprawdzanie kolizji
+            // Przechodzimy przez każdy obiekt w wektorze (używamy referencji & żeby nie kopiować)
+            for (auto& currentTower : towers) {
 
-     }
+                // Dla AKTUALNEJ wieży sprawdzamy kolizje z całą resztą listy
+                std::vector<gameObject*> hits = currentTower.checkCollisions(towers);
 
-     // -------------- render --------------
+                if (!hits.empty()) {
+                    // cout << "Obiekt " << currentTower.name << " koliduje z " << hits.size() << " obiektami." << endl;
+
+                    for (auto hitObject : hits) {
+                        // cout << " -> Kolizja z: " << hitObject->name << endl;
+
+                        // Oznaczamy obiekt, w który uderzyliśmy, jako zniszczony
+                        hitObject->destroy = true;
+                    }
+                }
+            }
+            // wychodzenie z gry
+            if (e.type == SDL_KEYDOWN) {
+                if (e.key.keysym.sym == SDLK_ESCAPE) {
+                    running = false;
+                }
+            }
+            // robi update renderu przycisku
+            uiButton.update(renderer, e, current_tower);
+        }
+
+        // -------------- render --------------
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
@@ -247,11 +256,15 @@ int main(int argc, char *argv[]) {
         notification_manager.update();
         // SDL_RenderCopy(renderer, player_texture, nullptr, &player);
 
+        // czyszczenie pamięci po update, bo tam sprawdzamy kolizje
+        std::erase_if(towers, [](const gameObject &t) {
+            return t.destroy;
+        });
+
         // rysuje przycisk
         SDL_Event drawEvent{};
         uiButton.update(renderer, drawEvent, current_tower);
 
-        SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
         SDL_RenderPresent(renderer);
         SDL_Delay(10);
 
