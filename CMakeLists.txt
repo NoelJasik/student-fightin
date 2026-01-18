@@ -17,7 +17,8 @@ option(SDL2_DISABLE_INSTALL "Disable installing SDL2" ON)
 
 # Zmuszamy SDL'a do skompilowania statycznie
 option(SDL2_IMAGE_BUILD_SHARED_LIBS "Build shared SDL2_image" OFF)
-option(SDL2_IMAGE_BUILD_TESTS "Build SDL2_image tests" OFF) # Speeds up build
+# Wyłączamy testy żeby szybciej szło
+option(SDL2_IMAGE_BUILD_TESTS "Build SDL2_image tests" OFF)
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libs" FORCE)
 set(SDL2_SHARED OFF CACHE BOOL "Link SDL2 shared" FORCE)

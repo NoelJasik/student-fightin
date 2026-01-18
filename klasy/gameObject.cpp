@@ -36,6 +36,20 @@ void gameObject::setMoveSpeed(int _ySpeed, int _xSpeed) {
     xSpeed = _xSpeed;
 }
 
+float gameObject::getDistance(gameObject other) {
+    float thisCenterX = rect.x + rect.w / 2;
+    float thisCenterY = rect.y + rect.h / 2;
+    float otherCenterX = other.rect.x + other.rect.w / 2;
+    float otherCenterY = other.rect.y + other.rect.h / 2;
+    float deltaX = otherCenterX - thisCenterX;
+    float deltaY = otherCenterY - thisCenterY;
+    return sqrtf(deltaX * deltaX + deltaY * deltaY);
+}
+
+float gameObject::calculateDistance(gameObject a, gameObject b) {
+    return a.getDistance(b);
+}
+
 // wywoływane co klatkę
 void gameObject::update() {
    moveBySpeed();

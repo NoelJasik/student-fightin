@@ -18,12 +18,7 @@ SDL_Surface* background_surface = IMG_Load("assets/bg.jpg");
 // daje jako zmienne bo w obliczeniach się przyda
 static int _WIDTH = 1280;
 static int _HEIGHT = 720;
-//oblicza dystans pomiedzy 2 jednostkami Mateusz 16.12
-double CalcualteDistance(gameObject obj1, gameObject obj2) {
-    double distance = sqrt(pow(obj1.rect.x-obj2.rect.x, 2) + pow(obj1.rect.y-obj2.rect.y, 2));
-    return distance;
 
-}
 
 void spawnTower(int _x, int _y, int _type) {
     gameObject tower;
@@ -196,7 +191,8 @@ int main(int argc, char *argv[]) {
                  float can_be_placed=true;
                  if (current_tower==1) {
                      for (int i=0; i<towers.size(); i++) {
-                         distance=CalcualteDistance(towers[i], gameObject(e.button.x,e.button.y,20,30,"Infantry Tower",100));
+                         distance=gameObject::calculateDistance(towers[i], gameObject(e.button.x,e.button.y,20,30,"Infantry Tower",100));
+                         // cout << "Distance: " << distance << " [i]" << i << endl;
                          if (distance<45) {
                              can_be_placed=false;
                              // to jest zjebane, bo psuje gameplay zatrzymując całą grę
@@ -206,7 +202,7 @@ int main(int argc, char *argv[]) {
                      }
                  }else if (current_tower==3) {
                      for (int i=0; i<towers.size(); i++) {
-                         distance=CalcualteDistance(towers[i], gameObject(e.button.x,e.button.y,20,30,"Infantry Tower",100));
+                         distance=gameObject::calculateDistance(towers[i], gameObject(e.button.x,e.button.y,20,30,"Infantry Tower",100));
                          if (distance<65) {
                              can_be_placed=false;
                              // to jest zjebane, bo psuje gameplay zatrzymując całą grę

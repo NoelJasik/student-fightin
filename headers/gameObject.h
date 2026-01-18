@@ -19,6 +19,8 @@ public:
     void moveBySpeed();
     void setMoveSpeed(int _ySpeed, int _xSpeed);
     void update();
+    float getDistance(gameObject other);
+    static float calculateDistance(gameObject a, gameObject b);
 
 };
 
