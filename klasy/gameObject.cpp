@@ -98,7 +98,7 @@ void gameObject::update() {
     }
 
     if(!isEnemy) {
-
+startWave
     }
 }
 

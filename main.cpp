@@ -11,6 +11,7 @@
 using namespace std;
 
 vector<gameObject> towers;
+vector<gameObject> enemies;
 
 // ------ GRAFIKI ------
 SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
@@ -32,11 +33,14 @@ void checkCollisions() {
                 // cout << " -> Kolizja z: " << hitObject->name << endl;
 
                 // Oznaczamy obiekt, w który uderzyliśmy, jako zniszczony
-                hitObject->destroy = true;
+                // hitObject->destroy = true;
+                hitObject->hp-=10;
             }
         }
     }
 }
+
+
 
 void spawnTower(int _x, int _y, int _type) {
     gameObject tower;
@@ -66,6 +70,14 @@ void spawnTower(int _x, int _y, int _type) {
     if (tower.rect.y + tower.rect.h > _HEIGHT) tower.rect.y = _HEIGHT - tower.rect.h;
 
     towers.push_back(tower);
+}
+
+void startWave(int _enemyCount, int _time) {
+    for (int i = 0; i < _enemyCount; i++) {
+        gameObject enemy = gameObject(0, rand() % _HEIGHT, 30, 30, "Enemy", 50, true);
+        enemy.setMoveSpeed(0, -2);
+        enemies.push_back(enemy);
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -258,6 +270,10 @@ int main(int argc, char *argv[]) {
          SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
          t.update();
         }
+     for (auto& e : enemies) {
+         SDL_RenderCopy(renderer, tower_texture, nullptr, &e.rect);
+         e.update();
+     }
         notification_manager.render(window);
         notification_manager.update();
         // SDL_RenderCopy(renderer, player_texture, nullptr, &player);
