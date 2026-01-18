@@ -3,6 +3,7 @@
 #include <vector>
 #include "headers/gameObject.h"
 #include "headers/button.h"
+#include "headers/notification.h"
 #include "math.h"
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -61,7 +62,8 @@ int main(int argc, char *argv[]) {
         // inicjalizacja sld2_ttf dawid
         SDL_Log("TTF_Init error: %s", TTF_GetError());
     }
-    TTF_Font *font = TTF_OpenFont("assets/GravitasOne-Regular.ttf", 64); // pobieranie fonta
+    TTF_Font* font = TTF_OpenFont("assets/PlaywriteCU-Regular.ttf", 32); // pobieranie fonta
+    TTF_Font* fontNotification = TTF_OpenFont("assets/PlaywriteCU-Regular.ttf", 16); // pobieranie fonta
     if (!font) {
         SDL_Log("Font error: %s", TTF_GetError());
     }
@@ -145,15 +147,15 @@ int main(int argc, char *argv[]) {
     SDL_Rect textRect;
     textRect.w = textSurface->w;
     textRect.h = textSurface->h;
-    textRect.x = _WIDTH - textRect.w;
-    textRect.y = 0;
+    textRect.x = 0;
+    textRect.y = _HEIGHT-textRect.h;
     SDL_FreeSurface(textSurface);
 
     Button uiButton; // renderuje przycisk
+    NotificationManager notification_manager(renderer,fontNotification);
+ while (running) {
 
-    while (running) {
-        while (SDL_PollEvent(&e)) {
-            // -------------- input --------------
+     while (SDL_PollEvent(&e)) {
 
             if (e.type == SDL_QUIT) {
                 running = false;
@@ -243,16 +245,16 @@ int main(int argc, char *argv[]) {
 
         // -------------- render --------------
 
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background_texture, nullptr, nullptr);
-        // SDL_RenderCopy(renderer, player_texture, nullptr, &player);
-
-        for (auto &t: towers) {
-            SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
-            // TODO to trzeba zrobić matematycznie żeby działało niezależnie od fps / zablokowane na 60 fps
-            t.update();
-            SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
-
+        for (auto& t : towers) {
+         SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
+         t.update();
         }
+        notification_manager.render(window);
+        notification_manager.update();
+        // SDL_RenderCopy(renderer, player_texture, nullptr, &player);
 
         // czyszczenie pamięci po update, bo tam sprawdzamy kolizje
         std::erase_if(towers, [](const gameObject &t) {
@@ -265,12 +267,13 @@ int main(int argc, char *argv[]) {
 
         SDL_RenderPresent(renderer);
         SDL_Delay(10);
-    }
 
+     }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_DestroyTexture(textTexture);
     TTF_CloseFont(font);
+    TTF_CloseFont(fontNotification);
     TTF_Quit();
     SDL_Quit();
 
