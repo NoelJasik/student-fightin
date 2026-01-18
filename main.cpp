@@ -15,11 +15,28 @@ vector<gameObject> towers;
 // ------ GRAFIKI ------
 SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
 
-
+// TODO - wrzucić to do klasy żeby się dało łatwo pobierać
 // daje jako zmienne bo w obliczeniach się przyda
 static int _WIDTH = 1280;
 static int _HEIGHT = 720;
+void checkCollisions() {
+    for (auto& currentTower : towers) {
 
+        // Dla AKTUALNEJ wieży sprawdzamy kolizje z całą resztą listy
+        std::vector<gameObject*> hits = currentTower.checkCollisions(towers);
+
+        if (!hits.empty()) {
+            // cout << "Obiekt " << currentTower.name << " koliduje z " << hits.size() << " obiektami." << endl;
+
+            for (auto hitObject : hits) {
+                // cout << " -> Kolizja z: " << hitObject->name << endl;
+
+                // Oznaczamy obiekt, w który uderzyliśmy, jako zniszczony
+                hitObject->destroy = true;
+            }
+        }
+    }
+}
 
 void spawnTower(int _x, int _y, int _type) {
     gameObject tower;
@@ -220,22 +237,7 @@ int main(int argc, char *argv[]) {
             }
             // sprawdzanie kolizji
             // Przechodzimy przez każdy obiekt w wektorze (używamy referencji & żeby nie kopiować)
-            for (auto& currentTower : towers) {
-
-                // Dla AKTUALNEJ wieży sprawdzamy kolizje z całą resztą listy
-                std::vector<gameObject*> hits = currentTower.checkCollisions(towers);
-
-                if (!hits.empty()) {
-                    // cout << "Obiekt " << currentTower.name << " koliduje z " << hits.size() << " obiektami." << endl;
-
-                    for (auto hitObject : hits) {
-                        // cout << " -> Kolizja z: " << hitObject->name << endl;
-
-                        // Oznaczamy obiekt, w który uderzyliśmy, jako zniszczony
-                        hitObject->destroy = true;
-                    }
-                }
-            }
+         checkCollisions();
             // wychodzenie z gry
             if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_ESCAPE) {
