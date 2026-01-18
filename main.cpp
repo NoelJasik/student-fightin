@@ -211,7 +211,10 @@ int main(int argc, char *argv[]) {
                         }
                     }
                     if (can_be_placed == true) {
+
                         spawnTower(e.button.x, e.button.y, current_tower);
+                    }else {
+                        notification_manager.add("Nie mozna postawic jednsotki");
                     }
                 }
             }
@@ -248,6 +251,7 @@ int main(int argc, char *argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background_texture, nullptr, nullptr);
+        SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
         for (auto& t : towers) {
          SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
          t.update();
