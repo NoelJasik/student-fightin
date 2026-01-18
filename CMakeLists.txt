@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24) # Nowsza wersja, lepiej powinno śmigać
 
 
-
+set(CMAKE_POLICY_VERSION_MINIMUM "3.5") # wprowadzamy politykę ze starszej wersji bo w nowszej jest wywalone wsparcie dla starej wersji cmake, która jest używana w bibliotece freetype
 
 project(uniproject VERSION 0.0.1 LANGUAGES CXX C)
 
