@@ -27,6 +27,19 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
         update();
 }
 
+gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, bool _isEnemy) {
+    rect.x = _x;
+    rect.y = _y;
+    rect.w = _w;
+    rect.h = _h;
+    name = _name;
+    hp = _hp;
+    isEnemy = _isEnemy;
+    update();
+}
+
+
+
 void gameObject::moveBySpeed() {
     rect.x += xSpeed;
     rect.y += ySpeed;
@@ -79,9 +92,13 @@ void gameObject::update() {
         destroy = true;
     }
 
-    // Przykład 2: Jeśli wyjedzie daleko poza ekran (żeby nie trzymać w pamięci pocisków lecących w nieskończoność)
+    // prosta logika usuwania poza ekranem
     if (rect.x > 2000 || rect.x < -500) {
         destroy = true;
+    }
+
+    if(!isEnemy) {
+
     }
 }
 
