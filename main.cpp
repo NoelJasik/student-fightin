@@ -67,7 +67,8 @@ int main(int argc, char *argv[]) {
     if (TTF_Init() == -1) { // inicjalizacja sld2_ttf dawid
         SDL_Log("TTF_Init error: %s", TTF_GetError());
     }
-    TTF_Font* font = TTF_OpenFont("assets/GravitasOne-Regular.ttf", 64); // pobieranie fonta
+    TTF_Font* font = TTF_OpenFont("assets/PlaywriteCU-Regular.ttf", 32); // pobieranie fonta
+    TTF_Font* fontNotification = TTF_OpenFont("assets/PlaywriteCU-Regular.ttf", 16); // pobieranie fonta
     if (!font) {
         SDL_Log("Font error: %s", TTF_GetError());
     }
@@ -155,12 +156,12 @@ int main(int argc, char *argv[]) {
     SDL_Rect textRect;
     textRect.w = textSurface->w;
     textRect.h = textSurface->h;
-    textRect.x = _WIDTH - textRect.w;
-    textRect.y = 0;
+    textRect.x = 0;
+    textRect.y = _HEIGHT-textRect.h;
     SDL_FreeSurface(textSurface);
 
     Button uiButton; // renderuje przycisk
-    NotificationManager notification_manager(renderer,font);
+    NotificationManager notification_manager(renderer,fontNotification);
  while (running) {
 
      while (SDL_PollEvent(&e)) {
@@ -219,7 +220,6 @@ int main(int argc, char *argv[]) {
                  }
                  if (can_be_placed==true) {
                      spawnTower(e.button.x,e.button.y,current_tower);
-                     notification_manager.add("test");
                  }
              }
          }
@@ -260,6 +260,7 @@ int main(int argc, char *argv[]) {
     SDL_DestroyWindow(window);
     SDL_DestroyTexture(textTexture);
     TTF_CloseFont(font);
+    TTF_CloseFont(fontNotification);
     TTF_Quit();
     SDL_Quit();
 

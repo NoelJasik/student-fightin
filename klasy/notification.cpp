@@ -10,12 +10,45 @@
 int textW = 0, textH = 0;
 TTF_Font* font;
 static const int MAX_VISIBLE = 3;
-// ===== Notification =====
+void DrawRoundedRect(SDL_Renderer* renderer,
+                     const SDL_Rect& rect,
+                     int radius,
+                     SDL_Color color)
+{
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+
+    // srodek
+    SDL_Rect center = {
+        rect.x + radius,
+        rect.y,
+        rect.w - 2 * radius,
+        rect.h
+    };
+    SDL_RenderFillRect(renderer, &center);
+
+    // lewa i prawa belka
+    SDL_Rect left  = { rect.x, rect.y + radius, radius, rect.h - 2 * radius };
+    SDL_Rect right = { rect.x + rect.w - radius, rect.y + radius, radius, rect.h - 2 * radius };
+    SDL_RenderFillRect(renderer, &left);
+    SDL_RenderFillRect(renderer, &right);
+
+    // rogi (cwiartki okregu)
+    for (int w = 0; w < radius; w++) {
+        for (int h = 0; h < radius; h++) {
+            if ((w*w + h*h) <= radius*radius) {
+                SDL_RenderDrawPoint(renderer, rect.x + radius - w, rect.y + radius - h);                     // lewy górny
+                SDL_RenderDrawPoint(renderer, rect.x + rect.w - radius + w - 1, rect.y + radius - h);      // prawy górny
+                SDL_RenderDrawPoint(renderer, rect.x + radius - w, rect.y + rect.h - radius + h - 1);      // lewy dolny
+                SDL_RenderDrawPoint(renderer, rect.x + rect.w - radius + w - 1, rect.y + rect.h - radius + h - 1); // prawy dolny
+            }
+        }
+    }
+}
 Notification::Notification(const std::string& text, Uint32 duration)
     : text(text), startTime(SDL_GetTicks()), duration(4000){}
 
 
-// ===== NotificationManager =====
 NotificationManager::NotificationManager(SDL_Renderer* renderer, TTF_Font* font)
     : renderer(renderer), font(font) {
 }
@@ -28,8 +61,8 @@ void NotificationManager::render(SDL_Window* window) {
     int winW, winH;
     SDL_GetWindowSize(window, &winW, &winH);
 
-    const int PADDING = 12;
-    const int MARGIN  = 15;
+    const int PADDING = 3;
+    const int MARGIN  = 3;
     const int SPACING = 10;
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -64,7 +97,7 @@ void NotificationManager::render(SDL_Window* window) {
 
         SDL_SetRenderDrawColor(renderer,
             bgColor.r, bgColor.g, bgColor.b, bgColor.a);
-        SDL_RenderFillRect(renderer, &bgRect);
+        DrawRoundedRect(renderer, bgRect, 8, bgColor);
 
         //tekst
         SDL_Rect textRect {
