@@ -5,6 +5,7 @@
 #include "../headers/gameObject.h"
 #include <string>
 #include <thread>
+#include <vector>
 
 
 gameObject::gameObject() {
@@ -49,10 +50,39 @@ float gameObject::getDistance(gameObject other) {
 float gameObject::calculateDistance(gameObject a, gameObject b) {
     return a.getDistance(b);
 }
+// Metoda zwraca listę wskaźników na obiekty, z którymi ten konkretny obiekt koliduje
+std::vector<gameObject*> gameObject::checkCollisions(std::vector<gameObject>& others) {
+    std::vector<gameObject*> collidedObjects;
+
+    for (auto& obj : others) {
+        // Sprawdź, czy nie sprawdzamy kolizji z samym sobą, po adresie w pamięci
+        if (this == &obj) {
+            continue;
+        }
+
+        // sprawdza czy dwa prostokąty (rect) na siebie nachodzą, równe wielkości grafiki
+        // TODO - zmienić na kółko
+        if (SDL_HasIntersection(&this->rect, &obj.rect)) {
+            // Jeśli jest kolizja, dodajemy wskaźnik na ten obiekt do listy
+            collidedObjects.push_back(&obj);
+        }
+    }
+
+    return collidedObjects;
+}
+
 
 // wywoływane co klatkę
 void gameObject::update() {
    moveBySpeed();
+    if (hp <= 0) {
+        destroy = true;
+    }
+
+    // Przykład 2: Jeśli wyjedzie daleko poza ekran (żeby nie trzymać w pamięci pocisków lecących w nieskończoność)
+    if (rect.x > 2000 || rect.x < -500) {
+        destroy = true;
+    }
 }
 
 
