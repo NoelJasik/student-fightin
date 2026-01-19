@@ -13,6 +13,7 @@
 using namespace std;
 
 vector<gameObject> towers;
+vector<gameObject> enemies;
 
 // ------ GRAFIKI ------
 SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
@@ -21,6 +22,7 @@ SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
 // daje jako zmienne bo w obliczeniach się przyda
 static int _WIDTH = 1280;
 static int _HEIGHT = 720;
+
 void checkCollisions() {
     for (auto& currentTower : towers) {
 
@@ -34,11 +36,14 @@ void checkCollisions() {
                 // cout << " -> Kolizja z: " << hitObject->name << endl;
 
                 // Oznaczamy obiekt, w który uderzyliśmy, jako zniszczony
-                hitObject->destroy = true;
+                // hitObject->destroy = true;
+                hitObject->hp-=10;
             }
         }
     }
 }
+
+
 
 void spawnTower(int _x, int _y, int _type) {
     gameObject tower;
@@ -68,6 +73,14 @@ void spawnTower(int _x, int _y, int _type) {
     if (tower.rect.y + tower.rect.h > _HEIGHT) tower.rect.y = _HEIGHT - tower.rect.h;
 
     towers.push_back(tower);
+}
+
+void startWave(int _enemyCount, int _enemySpread) {
+    for (int i = 0; i < _enemyCount; i++) {
+        gameObject enemy = gameObject(_WIDTH + rand() % _enemySpread, rand() % _HEIGHT, 50, 90, "Enemy", 50, true);
+        enemy.setMoveSpeed(0, -2);
+        enemies.push_back(enemy);
+    }
 }
 
 SDL_Surface * TTF_RenderText_Solid(TTF_Font * font, const char * str, int fg, SDL_Color sdl_color);
@@ -187,7 +200,10 @@ int main(int argc, char *argv[]) {
                         break;
                     case SDLK_0:
                         current_tower = 0;
+                    case SDLK_q:
+                        startWave(10, 1000);
                 }
+
                 // cout << current_tower << endl;
             }
 
@@ -255,6 +271,10 @@ int main(int argc, char *argv[]) {
          SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
          t.update();
         }
+     for (auto& e : enemies) {
+         SDL_RenderCopy(renderer, tower_texture, nullptr, &e.rect);
+         e.update();
+     }
         notification_manager.render(window);
         notification_manager.update();
         // SDL_RenderCopy(renderer, player_texture, nullptr, &player);
