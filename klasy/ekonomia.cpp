@@ -9,7 +9,6 @@ using namespace std;
 int kasa = 100;//dodanie kasy ~dawid trzeba będzie voida zrobić z update
 ekonomia::ekonomia() = default;
     void ekonomia::update(SDL_Renderer *renderer) {
-        cout << "test";
 
         TTF_Font* font = TTF_OpenFont("assets/PlaywriteCU-Regular.ttf", 32); // pobieranie fonta
         TTF_Font* fontNotification = TTF_OpenFont("assets/PlaywriteCU-Regular.ttf", 16); // pobieranie fonta
