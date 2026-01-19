@@ -8,6 +8,8 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
+#include "ekonomia.h"
+
 using namespace std;
 
 vector<gameObject> towers;
@@ -81,6 +83,7 @@ void startWave(int _enemyCount, int _enemySpread) {
     }
 }
 
+SDL_Surface * TTF_RenderText_Solid(TTF_Font * font, const char * str, int fg, SDL_Color sdl_color);
 
 int main(int argc, char *argv[]) {
     // Sprawdzanie errorów
@@ -172,17 +175,9 @@ int main(int argc, char *argv[]) {
     SDL_SetRenderTarget(renderer, nullptr);
 
 
-    SDL_Color textColor = {200, 23, 20, 255}; // ogarnianie aby to działało( dawid )w sensie ta czcionka i ten cały ttf
-    SDL_Surface *textSurface = TTF_RenderText_Solid(font, "$000", textColor);
-    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_Rect textRect;
-    textRect.w = textSurface->w;
-    textRect.h = textSurface->h;
-    textRect.x = 0;
-    textRect.y = _HEIGHT-textRect.h;
-    SDL_FreeSurface(textSurface);
 
     Button uiButton; // renderuje przycisk
+    ekonomia uiEkonomia;
     NotificationManager notification_manager(renderer,fontNotification);
  while (running) {
 
@@ -263,6 +258,7 @@ int main(int argc, char *argv[]) {
             }
             // robi update renderu przycisku
             uiButton.update(renderer, e, current_tower);
+         uiEkonomia.update(renderer);
         }
 
         // -------------- render --------------
@@ -270,7 +266,7 @@ int main(int argc, char *argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background_texture, nullptr, nullptr);
-        SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
+
         for (auto& t : towers) {
          SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
          t.update();
@@ -291,14 +287,14 @@ int main(int argc, char *argv[]) {
         // rysuje przycisk
         SDL_Event drawEvent{};
         uiButton.update(renderer, drawEvent, current_tower);
-
+        uiEkonomia.update(renderer);
         SDL_RenderPresent(renderer);
         SDL_Delay(10);
 
      }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    SDL_DestroyTexture(textTexture);
+
     TTF_CloseFont(font);
     TTF_CloseFont(fontNotification);
     TTF_Quit();
