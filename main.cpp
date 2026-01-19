@@ -20,8 +20,18 @@ SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
 
 // TODO - wrzucić to do klasy żeby się dało łatwo pobierać
 // daje jako zmienne bo w obliczeniach się przyda
-static int _WIDTH = 1280;
-static int _HEIGHT = 720;
+class ScreenSize{
+    private:
+    static const int _HEIGHT = 720;
+    static const int _WIDTH = 1280;
+
+    public:
+    static int getWidth() {
+        return _WIDTH;
+    }static int getHeight() {
+        return _HEIGHT;
+    }
+};
 
 void checkCollisions() {
     for (auto& currentTower : towers) {
@@ -69,15 +79,15 @@ void spawnTower(int _x, int _y, int _type) {
     // clamp żeby w ekranie się zmieściło
     if (tower.rect.x < 0) tower.rect.x = 0;
     if (tower.rect.y < 0) tower.rect.y = 0;
-    if (tower.rect.x + tower.rect.w > _WIDTH) tower.rect.x = _WIDTH - tower.rect.w;
-    if (tower.rect.y + tower.rect.h > _HEIGHT) tower.rect.y = _HEIGHT - tower.rect.h;
+    if (tower.rect.x + tower.rect.w > ScreenSize::getWidth()) tower.rect.x = ScreenSize::getWidth() - tower.rect.w;
+    if (tower.rect.y + tower.rect.h > ScreenSize::getHeight()) tower.rect.y = ScreenSize::getHeight() - tower.rect.h;
 
     towers.push_back(tower);
 }
 
 void startWave(int _enemyCount, int _enemySpread) {
     for (int i = 0; i < _enemyCount; i++) {
-        gameObject enemy = gameObject(_WIDTH + rand() % _enemySpread, rand() % _HEIGHT, 50, 90, "Enemy", 50, true);
+        gameObject enemy = gameObject(ScreenSize::getWidth() + rand() % _enemySpread, rand() % ScreenSize::getHeight(), 50, 90, "Enemy", 50, true);
         enemy.setMoveSpeed(0, -2);
         enemies.push_back(enemy);
     }
@@ -113,11 +123,11 @@ int main(int argc, char *argv[]) {
     int current_tower = 0;
 
 
-    SDL_CreateWindowAndRenderer(_WIDTH, _HEIGHT, 0, &window, &renderer);
+    SDL_CreateWindowAndRenderer(ScreenSize::getWidth(), ScreenSize::getHeight(), 0, &window, &renderer);
 
     // Dałem statyczne, bo to jest tło
-    auto background_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, _WIDTH,
-                                                _HEIGHT);
+    auto background_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, ScreenSize::getWidth(),
+                                                ScreenSize::getHeight());
 
     // Wczytywanie tła (to można było by przerobić na funkcje)
     if (!background_surface) {
@@ -211,7 +221,7 @@ int main(int argc, char *argv[]) {
             // stawianie wieży w pozycji kursora
             if (e.type == SDL_MOUSEBUTTONDOWN) {
                 // można stawiać tylko w lewej połowie ekranu
-                if (e.button.button == SDL_BUTTON_LEFT && e.button.x <= _WIDTH / 2) {
+                if (e.button.button == SDL_BUTTON_LEFT && e.button.x <= ScreenSize::getWidth() / 2) {
                     //zapobieganie kolizji jednostek Mateusz 16.12
                     double distance = 0; // zmienne do przechowywania dystansu i czy jednsotka moze byc postawiona
                     float can_be_placed = true;
