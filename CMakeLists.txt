@@ -66,6 +66,8 @@ add_executable(uniProject
         headers/button.h
         klasy/notification.cpp
         headers/notification.h
+        klasy/ekonomia.cpp
+        headers/ekonomia.h
 )
 
 # --- 4. Dodajemy ścieżki do naszych bibliotek (mam nadzieje że windows to zrozumie) ---
