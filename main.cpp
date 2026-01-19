@@ -20,6 +20,7 @@ SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
 // daje jako zmienne bo w obliczeniach się przyda
 static int _WIDTH = 1280;
 static int _HEIGHT = 720;
+
 void checkCollisions() {
     for (auto& currentTower : towers) {
 
@@ -72,13 +73,14 @@ void spawnTower(int _x, int _y, int _type) {
     towers.push_back(tower);
 }
 
-void startWave(int _enemyCount, int _time) {
+void startWave(int _enemyCount, int _enemySpread) {
     for (int i = 0; i < _enemyCount; i++) {
-        gameObject enemy = gameObject(0, rand() % _HEIGHT, 30, 30, "Enemy", 50, true);
+        gameObject enemy = gameObject(_WIDTH + rand() % _enemySpread, rand() % _HEIGHT, 50, 90, "Enemy", 50, true);
         enemy.setMoveSpeed(0, -2);
         enemies.push_back(enemy);
     }
 }
+
 
 int main(int argc, char *argv[]) {
     // Sprawdzanie errorów
@@ -203,7 +205,10 @@ int main(int argc, char *argv[]) {
                         break;
                     case SDLK_0:
                         current_tower = 0;
+                    case SDLK_q:
+                        startWave(10, 1000);
                 }
+
                 // cout << current_tower << endl;
             }
 
