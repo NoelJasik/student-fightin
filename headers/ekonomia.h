@@ -10,7 +10,7 @@ class ekonomia {
 public:
     ekonomia();
 
-    void koszt(SDL_Renderer * renderer);
+   // void koszt(SDL_Renderer * renderer);
 
     void update(SDL_Renderer * renderer);
 };
