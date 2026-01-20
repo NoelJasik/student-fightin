@@ -11,8 +11,11 @@
 #include "headers/inputBox.h"
 #include "ekonomia.h"
 #include "headers/uiStatsBox.h"
+#include "headers/gameSettings.h"
 
 using namespace std;
+// Można wyciągnąć z tego klase screensize
+using namespace gameSettings;
 
 vector<gameObject> towers;
 vector<gameObject> enemies;
@@ -22,20 +25,6 @@ SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
 
 // TODO - wrzucić to do klasy żeby się dało łatwo pobierać
 // daje jako zmienne bo w obliczeniach się przyda
-class ScreenSize {
-private:
-    static const int _HEIGHT = 720;
-    static const int _WIDTH = 1280;
-
-public:
-    static int getWidth() {
-        return _WIDTH;
-    }
-
-    static int getHeight() {
-        return _HEIGHT;
-    }
-};
 
 uiStatsBox stats_box;
 gameObject *selectedTower = nullptr;
@@ -43,17 +32,13 @@ gameObject *selectedTower = nullptr;
 void checkCollisions() {
     for (auto &currentTower: towers) {
         // Dla AKTUALNEJ wieży sprawdzamy kolizje z całą resztą listy
-        std::vector<gameObject *> hits = currentTower.checkCollisions(towers);
+        std::vector<gameObject *> hits = currentTower.checkCollisions(enemies);
 
         if (!hits.empty()) {
             // cout << "Obiekt " << currentTower.name << " koliduje z " << hits.size() << " obiektami." << endl;
 
             for (auto hitObject: hits) {
-                // cout << " -> Kolizja z: " << hitObject->name << endl;
-
-                // Oznaczamy obiekt, w który uderzyliśmy, jako zniszczony
-                // hitObject->destroy = true;
-                hitObject->hp -= 10;
+                currentTower.combatWith(*hitObject);
             }
         }
     }
@@ -72,7 +57,7 @@ void spawnTower(int _x, int _y, int _type) {
             break;
         case 2:
             tower = gameObject(_x, _y, 100, 200, "Koparka", 200, 10, 1.0);
-            tower.setMoveSpeed(0, 10);
+            tower.setMaxMoveSpeed(0, 10);
             break;
         case 3:
             tower = gameObject(_x, _y, 100, 100, "Studenciak (budynek)", 150, 10, 1.0);
@@ -90,22 +75,40 @@ void spawnTower(int _x, int _y, int _type) {
     towers.push_back(tower);
 }
 
+// Logika odpalania fal i spawnowania przeciwników
 void startWave(int _enemyCount, int _enemySpread) {
     for (int i = 0; i < _enemyCount; i++) {
         gameObject enemy = gameObject(ScreenSize::getWidth() + rand() % _enemySpread, rand() % ScreenSize::getHeight(),
-                                      50, 90, "Enemy", 50, 10, 1.0, true);
-        enemy.setMoveSpeed(0, -2);
+                                      50, 90, "Enemy", 50, 10, 1.0, true, -0.5f, 0);
         enemies.push_back(enemy);
     }
 }
 
+// TODO zrobić żeby to sie wyświetlało co X ticków, żeby łatwiej się testowało garbage collector.
+// void displayDebug() {
+//         std::cout << "--- Current Game Objects ---" << std::endl;
+//         std::cout << "Towers (" << towers.size() << "):" << std::endl;
+//         for (const auto& tower : towers) {
+//             std::cout << "  - Name: " << tower.name << ", Pos: (" << tower.rect.x << ", " << tower.rect.y << "), HP: " << tower.hp << std::endl;
+//         }
+//         std::cout << "Enemies (" << enemies.size() << "):" << std::endl;
+//         for (const auto& enemy : enemies) {
+//             std::cout << "  - Name: " << enemy.name << ", Pos: (" << enemy.rect.x << ", " << enemy.rect.y << "), HP: " << enemy.hp << std::endl;
+//         }
+//         std::cout << "----------------------------" << std::endl;
+// }
+
+// Czyścimy przeciwników i naszych z pamięci
 void gameObjectCleanup() {
+    // TODO Dodać do klasy gameobject funkcję onDestroy która się tu odpala, tam wjebiemy logike na dodawanie siana itd
     std::erase_if(towers, [](const gameObject &t) {
+        // displayDebug();
         return t.destroy;
     });
     std::erase_if(enemies, [](const gameObject &e) {
         return e.destroy;
     });
+
     if (selectedTower && selectedTower->destroy) {
         selectedTower = nullptr;
     }
@@ -226,7 +229,7 @@ int main(int argc, char *argv[]) {
                     case SDLK_9:
                         current_tower = 0;
                     case SDLK_q:
-                        startWave(10, 1000);
+                        startWave(1000, 100000);
                 }
 
 
@@ -292,9 +295,7 @@ int main(int argc, char *argv[]) {
                     }
                 }
             }
-            // sprawdzanie kolizji
-            // Przechodzimy przez każdy obiekt w wektorze (używamy referencji & żeby nie kopiować)
-            checkCollisions();
+
             // wychodzenie z gry
             if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_ESCAPE) {
@@ -316,6 +317,11 @@ int main(int argc, char *argv[]) {
         //     );
         //     inputBox.reset();
         //     }
+        // ---------- Fizyka ----------
+        // sprawdzanie kolizji
+        // Przechodzimy przez każdy obiekt w wektorze (używamy referencji & żeby nie kopiować)
+        checkCollisions();
+
         // -------------- render --------------
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
