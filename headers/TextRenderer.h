@@ -1,0 +1,8 @@
+//
+// Created by mateu on 20.01.2026.
+//
+
+#ifndef UNIPROJECT_TEXTRENDERER_H
+#define UNIPROJECT_TEXTRENDERER_H
+
+#endif //UNIPROJECT_TEXTRENDERER_H
