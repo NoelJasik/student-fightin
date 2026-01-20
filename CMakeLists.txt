@@ -68,6 +68,12 @@ add_executable(uniProject
         headers/notification.h
         klasy/ekonomia.cpp
         headers/ekonomia.h
+        klasy/TextRenderer.cpp
+        headers/TextRenderer.h
+        klasy/inputBox.cpp
+        headers/inputBox.h
+        klasy/uiStatsBox.cpp
+        headers/uiStatsBox.h
 )
 
 # --- 4. Dodajemy ścieżki do naszych bibliotek (mam nadzieje że windows to zrozumie) ---

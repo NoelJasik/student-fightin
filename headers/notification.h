@@ -9,6 +9,7 @@
 #include <SDL_ttf.h>
 #include <string>
 #include <vector>
+#include <TextRenderer.h>
 
 struct Notification {
     std::string text;
@@ -19,15 +20,14 @@ struct Notification {
 
 class NotificationManager {
 public:
-    NotificationManager(SDL_Renderer* renderer, TTF_Font* font);
+    NotificationManager(SDL_Renderer* renderer, TextRenderer* textRenderer);
 
     void add(const std::string& tex);
     void update();
     void render(SDL_Window* window);
-    void handleEvent(const SDL_Event& e, SDL_Window* window);
 private:
     SDL_Renderer* renderer;
-    TTF_Font* font;
+    TextRenderer* textRenderer;
     std::vector<Notification> notifications;
 
 };

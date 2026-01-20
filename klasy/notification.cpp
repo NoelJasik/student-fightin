@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <iostream>
 int textW = 0, textH = 0;
-TTF_Font* font;
+TextRenderer* textRenderer;
 static const int MAX_VISIBLE = 3;
 void DrawRoundedRect(SDL_Renderer* renderer,
                      const SDL_Rect& rect,
@@ -49,20 +49,21 @@ Notification::Notification(const std::string& text, Uint32 duration)
     : text(text), startTime(SDL_GetTicks()), duration(4000){}
 
 
-NotificationManager::NotificationManager(SDL_Renderer* renderer, TTF_Font* font)
-    : renderer(renderer), font(font) {
+NotificationManager::NotificationManager(SDL_Renderer* renderer,  TextRenderer* textRenderer)
+    : renderer(renderer), textRenderer(textRenderer) {
 }
 void NotificationManager::add(const std::string& text) {
     notifications.emplace_back(text);
 }
-void NotificationManager::render(SDL_Window* window) {
+void NotificationManager::render(SDL_Window* window)
+{
     if (notifications.empty()) return;
 
     int winW, winH;
     SDL_GetWindowSize(window, &winW, &winH);
 
-    const int PADDING = 3;
-    const int MARGIN  = 3;
+    const int PADDING = 6;
+    const int MARGIN  = 10;
     const int SPACING = 10;
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -70,24 +71,18 @@ void NotificationManager::render(SDL_Window* window) {
     int offsetY = MARGIN;
     int visible = std::min((int)notifications.size(), MAX_VISIBLE);
 
-    for (int i = 0; i < visible; i++) {
+    for (int i = 0; i < visible; i++)
+    {
         const Notification& n = notifications[i];
 
-        //text
-        SDL_Color textColor = {255,255,255,255};
-        SDL_Color bgColor   = {40,40,40,200};
+        SDL_Color textColor = {255, 255, 255, 255};
+        SDL_Color bgColor   = {40, 40, 40, 200};
 
-        SDL_Surface* surface =
-            TTF_RenderUTF8_Blended(font, n.text.c_str(), textColor);
-        if (!surface) continue;
+        // 🔹 pomiar tekstu
+        int textW = 0, textH = 0;
+        textRenderer->measure(n.text, textW, textH);
 
-        SDL_Texture* texture =
-            SDL_CreateTextureFromSurface(renderer, surface);
-
-        int textW = surface->w;
-        int textH = surface->h;
-        SDL_FreeSurface(surface);
-        //prawy gorny rog
+        // 🔹 tło (prawy górny róg)
         SDL_Rect bgRect {
             winW - (textW + PADDING * 2) - MARGIN,
             offsetY,
@@ -95,22 +90,19 @@ void NotificationManager::render(SDL_Window* window) {
             textH + PADDING * 2
         };
 
-        SDL_SetRenderDrawColor(renderer,
-            bgColor.r, bgColor.g, bgColor.b, bgColor.a);
+        // 🔹 rysuj tło
         DrawRoundedRect(renderer, bgRect, 8, bgColor);
 
-        //tekst
-        SDL_Rect textRect {
+        // 🔹 rysuj tekst
+        textRenderer->render(
+            n.text,
             bgRect.x + PADDING,
             bgRect.y + PADDING,
-            textW,
-            textH
-        };
-        SDL_RenderCopy(renderer, texture, nullptr, &textRect);
-        SDL_DestroyTexture(texture);
+            textColor
+        );
+
         offsetY += bgRect.h + SPACING;
     }
-
 }
 void NotificationManager::update()
 {
@@ -128,7 +120,6 @@ void NotificationManager::update()
         }
     }
 }
-
 
 
 

@@ -4,11 +4,13 @@
 #include "headers/gameObject.h"
 #include "headers/button.h"
 #include "headers/notification.h"
+#include "headers/TextRenderer.h"
 #include "math.h"
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-
+#include "headers/inputBox.h"
 #include "ekonomia.h"
+#include "headers/uiStatsBox.h"
 
 using namespace std;
 
@@ -32,7 +34,8 @@ class ScreenSize{
         return _HEIGHT;
     }
 };
-
+uiStatsBox stats_box;
+gameObject* selectedTower = nullptr;
 void checkCollisions() {
     for (auto& currentTower : towers) {
 
@@ -55,7 +58,7 @@ void checkCollisions() {
 
 
 
-void spawnTower(int _x, int _y, int _type) {
+void spawnTower(int _x, int _y, int _type, string name) {
     gameObject tower;
 
     // trzeba porobić klasy do wież
@@ -63,14 +66,14 @@ void spawnTower(int _x, int _y, int _type) {
         default:
             return;
         case 1:
-            tower = gameObject(_x, _y, 50, 90, "Infantry Tower", 100);
+            tower = gameObject(_x, _y, 50, 90, name, 100, 10, 1.0);
             break;
         case 2:
-            tower = gameObject(_x, _y, 100, 200, "Killdozer Tower", 200);
+            tower = gameObject(_x, _y, 100, 200, name, 200, 10, 1.0);
             tower.setMoveSpeed(0, 10);
             break;
         case 3:
-            tower = gameObject(_x, _y, 100, 100, "Cannon Tower", 150);
+            tower = gameObject(_x, _y, 100, 100, name, 150, 10, 1.0);
             break;
     }
     // wycentrowanie
@@ -87,7 +90,7 @@ void spawnTower(int _x, int _y, int _type) {
 
 void startWave(int _enemyCount, int _enemySpread) {
     for (int i = 0; i < _enemyCount; i++) {
-        gameObject enemy = gameObject(ScreenSize::getWidth() + rand() % _enemySpread, rand() % ScreenSize::getHeight(), 50, 90, "Enemy", 50, true);
+        gameObject enemy = gameObject(ScreenSize::getWidth() + rand() % _enemySpread, rand() % ScreenSize::getHeight(), 50, 90, "Enemy", 50,10, 1.0, true);
         enemy.setMoveSpeed(0, -2);
         enemies.push_back(enemy);
     }
@@ -106,11 +109,6 @@ int main(int argc, char *argv[]) {
         // inicjalizacja sld2_ttf dawid
         SDL_Log("TTF_Init error: %s", TTF_GetError());
     }
-    TTF_Font* font = TTF_OpenFont("assets/PlaywriteCU-Regular.ttf", 32); // pobieranie fonta
-    TTF_Font* fontNotification = TTF_OpenFont("assets/PlaywriteCU-Regular.ttf", 16); // pobieranie fonta
-    if (!font) {
-        SDL_Log("Font error: %s", TTF_GetError());
-    }
 
 
     SDL_Window *window = nullptr;
@@ -124,7 +122,8 @@ int main(int argc, char *argv[]) {
 
 
     SDL_CreateWindowAndRenderer(ScreenSize::getWidth(), ScreenSize::getHeight(), 0, &window, &renderer);
-
+    TextRenderer notficiationsTextRenderer(renderer, "assets/PlayWriteCU-Regular.ttf", 16);
+    InputBox inputBox(&notficiationsTextRenderer);
     // Dałem statyczne, bo to jest tło
     auto background_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, ScreenSize::getWidth(),
                                                 ScreenSize::getHeight());
@@ -188,11 +187,13 @@ int main(int argc, char *argv[]) {
 
     Button uiButton; // renderuje przycisk
     ekonomia uiEkonomia;
-    NotificationManager notification_manager(renderer,fontNotification);
+    NotificationManager notification_manager(renderer, &notficiationsTextRenderer);
  while (running) {
 
      while (SDL_PollEvent(&e)) {
-
+            inputBox.handleEvent(e);
+            if (inputBox.isActive())
+             continue;
             if (e.type == SDL_QUIT) {
                 running = false;
             }
@@ -208,7 +209,7 @@ int main(int argc, char *argv[]) {
                     case SDLK_3:
                         current_tower = 3;
                         break;
-                    case SDLK_0:
+                    case SDLK_9:
                         current_tower = 0;
                     case SDLK_q:
                         startWave(10, 1000);
@@ -221,16 +222,16 @@ int main(int argc, char *argv[]) {
             // stawianie wieży w pozycji kursora
             if (e.type == SDL_MOUSEBUTTONDOWN) {
                 // można stawiać tylko w lewej połowie ekranu
-                if (e.button.button == SDL_BUTTON_LEFT && e.button.x <= ScreenSize::getWidth() / 2) {
+                if (e.button.button == SDL_BUTTON_LEFT && e.button.x <= ScreenSize::getWidth() / 2 && current_tower !=0) {
                     //zapobieganie kolizji jednostek Mateusz 16.12
                     double distance = 0; // zmienne do przechowywania dystansu i czy jednsotka moze byc postawiona
                     float can_be_placed = true;
                     if (current_tower == 1) {
                         for (int i = 0; i < towers.size(); i++) {
                             distance = gameObject::calculateDistance(
-                                towers[i], gameObject(e.button.x, e.button.y, 20, 30, "Infantry Tower", 100));
+                                towers[i], gameObject(e.button.x, e.button.y, 20, 30, "Infantry Tower", 100, 10, 1.0));
                             // cout << "Distance: " << distance << " [i]" << i << endl;
-                            if (distance < 45) {
+                            if (distance < 75) {
                                 can_be_placed = false;
                                 // to jest zjebane, bo psuje gameplay zatrzymując całą grę
                                 // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
@@ -240,8 +241,8 @@ int main(int argc, char *argv[]) {
                     } else if (current_tower == 3) {
                         for (int i = 0; i < towers.size(); i++) {
                             distance = gameObject::calculateDistance(
-                                towers[i], gameObject(e.button.x, e.button.y, 20, 30, "Infantry Tower", 100));
-                            if (distance < 65) {
+                                towers[i], gameObject(e.button.x, e.button.y, 20, 30, "Infantry Tower", 100, 10, 1.0));
+                            if (distance < 95) {
                                 can_be_placed = false;
                                 // to jest zjebane, bo psuje gameplay zatrzymując całą grę
                                 // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
@@ -249,11 +250,26 @@ int main(int argc, char *argv[]) {
                             }
                         }
                     }
-                    if (can_be_placed == true) {
-
-                        spawnTower(e.button.x, e.button.y, current_tower);
+                    if (can_be_placed == true && current_tower != 0) {
+                        selectedTower = nullptr;
+                        inputBox.open(e.button.x, e.button.y, current_tower);
                     }else {
+                        selectedTower = nullptr;
                         notification_manager.add("Nie mozna postawic jednsotki");
+                    }
+                }
+                else if(e.button.button == SDL_BUTTON_LEFT){
+                    selectedTower = nullptr; // domslnie nic nie zaznaczone
+
+                    SDL_Point mousePoint{ e.button.x, e.button.y };
+
+                    for (auto& t : towers)
+                    {
+                        if (SDL_PointInRect(&mousePoint, &t.rect))
+                        {
+                            selectedTower = &t;
+                            break;
+                        }
                     }
                 }
             }
@@ -270,7 +286,16 @@ int main(int argc, char *argv[]) {
             uiButton.update(renderer, e, current_tower);
          uiEkonomia.update(renderer);
         }
-
+        if (inputBox.isConfirmed())
+            {
+                spawnTower(
+                inputBox.getX(),
+                inputBox.getY(),
+                current_tower,
+                inputBox.getText()
+            );
+            inputBox.reset();
+            }
         // -------------- render --------------
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -291,22 +316,30 @@ int main(int argc, char *argv[]) {
 
         // czyszczenie pamięci po update, bo tam sprawdzamy kolizje
         std::erase_if(towers, [](const gameObject &t) {
+
             return t.destroy;
         });
-
+        if (selectedTower && selectedTower->destroy)
+         selectedTower = nullptr;
         // rysuje przycisk
         SDL_Event drawEvent{};
         uiButton.update(renderer, drawEvent, current_tower);
         uiEkonomia.update(renderer);
+        inputBox.render(renderer);
+        if (selectedTower)
+        {
+         stats_box.render(
+             renderer,
+             notficiationsTextRenderer,
+             *selectedTower
+         );
+         }
         SDL_RenderPresent(renderer);
         SDL_Delay(10);
 
      }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-
-    TTF_CloseFont(font);
-    TTF_CloseFont(fontNotification);
     TTF_Quit();
     SDL_Quit();
 

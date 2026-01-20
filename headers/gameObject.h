@@ -15,12 +15,14 @@ public:
     float hp;
     float ySpeed = 0;
     float xSpeed = 0;
+    float attackdamage;
+    float attackspeed;
     bool isEnemy = false;
     // jak jest true to usuwamy z listy obiektów
     bool destroy = false;
     gameObject();
-    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp);
-    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, bool _isEnemy);
+    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float attackdamage, float attackspeed);
+    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float attackdamge, float attackspeed, bool _isEnemy);
 
     void moveBySpeed();
     void setMoveSpeed(int _ySpeed, int _xSpeed);
