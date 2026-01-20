@@ -22,43 +22,45 @@ SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
 
 // TODO - wrzucić to do klasy żeby się dało łatwo pobierać
 // daje jako zmienne bo w obliczeniach się przyda
-class ScreenSize{
-    private:
+class ScreenSize {
+private:
     static const int _HEIGHT = 720;
     static const int _WIDTH = 1280;
 
-    public:
+public:
     static int getWidth() {
         return _WIDTH;
-    }static int getHeight() {
+    }
+
+    static int getHeight() {
         return _HEIGHT;
     }
 };
-uiStatsBox stats_box;
-gameObject* selectedTower = nullptr;
-void checkCollisions() {
-    for (auto& currentTower : towers) {
 
+uiStatsBox stats_box;
+gameObject *selectedTower = nullptr;
+
+void checkCollisions() {
+    for (auto &currentTower: towers) {
         // Dla AKTUALNEJ wieży sprawdzamy kolizje z całą resztą listy
-        std::vector<gameObject*> hits = currentTower.checkCollisions(towers);
+        std::vector<gameObject *> hits = currentTower.checkCollisions(towers);
 
         if (!hits.empty()) {
             // cout << "Obiekt " << currentTower.name << " koliduje z " << hits.size() << " obiektami." << endl;
 
-            for (auto hitObject : hits) {
+            for (auto hitObject: hits) {
                 // cout << " -> Kolizja z: " << hitObject->name << endl;
 
                 // Oznaczamy obiekt, w który uderzyliśmy, jako zniszczony
                 // hitObject->destroy = true;
-                hitObject->hp-=10;
+                hitObject->hp -= 10;
             }
         }
     }
 }
 
 
-
-void spawnTower(int _x, int _y, int _type, string name) {
+void spawnTower(int _x, int _y, int _type) {
     gameObject tower;
 
     // trzeba porobić klasy do wież
@@ -66,14 +68,14 @@ void spawnTower(int _x, int _y, int _type, string name) {
         default:
             return;
         case 1:
-            tower = gameObject(_x, _y, 50, 90, name, 100, 10, 1.0);
+            tower = gameObject(_x, _y, 50, 90, "Student", 100, 10, 1.0);
             break;
         case 2:
-            tower = gameObject(_x, _y, 100, 200, name, 200, 10, 1.0);
+            tower = gameObject(_x, _y, 100, 200, "Koparka", 200, 10, 1.0);
             tower.setMoveSpeed(0, 10);
             break;
         case 3:
-            tower = gameObject(_x, _y, 100, 100, name, 150, 10, 1.0);
+            tower = gameObject(_x, _y, 100, 100, "Studenciak (budynek)", 150, 10, 1.0);
             break;
     }
     // wycentrowanie
@@ -90,13 +92,26 @@ void spawnTower(int _x, int _y, int _type, string name) {
 
 void startWave(int _enemyCount, int _enemySpread) {
     for (int i = 0; i < _enemyCount; i++) {
-        gameObject enemy = gameObject(ScreenSize::getWidth() + rand() % _enemySpread, rand() % ScreenSize::getHeight(), 50, 90, "Enemy", 50,10, 1.0, true);
+        gameObject enemy = gameObject(ScreenSize::getWidth() + rand() % _enemySpread, rand() % ScreenSize::getHeight(),
+                                      50, 90, "Enemy", 50, 10, 1.0, true);
         enemy.setMoveSpeed(0, -2);
         enemies.push_back(enemy);
     }
 }
 
-SDL_Surface * TTF_RenderText_Solid(TTF_Font * font, const char * str, int fg, SDL_Color sdl_color);
+void gameObjectCleanup() {
+    std::erase_if(towers, [](const gameObject &t) {
+        return t.destroy;
+    });
+    std::erase_if(enemies, [](const gameObject &e) {
+        return e.destroy;
+    });
+    if (selectedTower && selectedTower->destroy) {
+        selectedTower = nullptr;
+    }
+}
+
+SDL_Surface *TTF_RenderText_Solid(TTF_Font *font, const char *str, int fg, SDL_Color sdl_color);
 
 int main(int argc, char *argv[]) {
     // Sprawdzanie errorów
@@ -125,7 +140,8 @@ int main(int argc, char *argv[]) {
     TextRenderer notficiationsTextRenderer(renderer, "assets/GravitasOne-Regular.ttf", 16);
     InputBox inputBox(&notficiationsTextRenderer);
     // Dałem statyczne, bo to jest tło
-    auto background_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, ScreenSize::getWidth(),
+    auto background_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC,
+                                                ScreenSize::getWidth(),
                                                 ScreenSize::getHeight());
 
     // Wczytywanie tła (to można było by przerobić na funkcje)
@@ -184,16 +200,14 @@ int main(int argc, char *argv[]) {
     SDL_SetRenderTarget(renderer, nullptr);
 
 
-
     Button uiButton; // renderuje przycisk
     ekonomia uiEkonomia;
     NotificationManager notification_manager(renderer, &notficiationsTextRenderer);
- while (running) {
-
-     while (SDL_PollEvent(&e)) {
-            inputBox.handleEvent(e);
-            if (inputBox.isActive())
-             continue;
+    while (running) {
+        while (SDL_PollEvent(&e)) {
+            // inputBox.handleEvent(e);
+            // if (inputBox.isActive())
+            //  continue;
             if (e.type == SDL_QUIT) {
                 running = false;
             }
@@ -215,6 +229,7 @@ int main(int argc, char *argv[]) {
                         startWave(10, 1000);
                 }
 
+
                 // cout << current_tower << endl;
             }
 
@@ -222,7 +237,8 @@ int main(int argc, char *argv[]) {
             // stawianie wieży w pozycji kursora
             if (e.type == SDL_MOUSEBUTTONDOWN) {
                 // można stawiać tylko w lewej połowie ekranu
-                if (e.button.button == SDL_BUTTON_LEFT && e.button.x <= ScreenSize::getWidth() / 2 && current_tower !=0) {
+                if (e.button.button == SDL_BUTTON_LEFT && e.button.x <= ScreenSize::getWidth() / 2 && current_tower !=
+                    0) {
                     //zapobieganie kolizji jednostek Mateusz 16.12
                     double distance = 0; // zmienne do przechowywania dystansu i czy jednsotka moze byc postawiona
                     float can_be_placed = true;
@@ -252,21 +268,24 @@ int main(int argc, char *argv[]) {
                     }
                     if (can_be_placed == true && current_tower != 0) {
                         selectedTower = nullptr;
-                        inputBox.open(e.button.x, e.button.y, current_tower);
-                    }else {
+                        // inputBox.open(e.button.x, e.button.y, current_tower);
+                        spawnTower(
+                            e.button.x,
+                            e.button.y,
+                            current_tower
+                        );
+                    } else {
                         selectedTower = nullptr;
                         notification_manager.add("Nie mozna postawic jednsotki");
                     }
                 }
-                else if(e.button.button == SDL_BUTTON_LEFT){
+                if (e.button.button == SDL_BUTTON_RIGHT) {
                     selectedTower = nullptr; // domslnie nic nie zaznaczone
 
-                    SDL_Point mousePoint{ e.button.x, e.button.y };
+                    SDL_Point mousePoint{e.button.x, e.button.y};
 
-                    for (auto& t : towers)
-                    {
-                        if (SDL_PointInRect(&mousePoint, &t.rect))
-                        {
+                    for (auto &t: towers) {
+                        if (SDL_PointInRect(&mousePoint, &t.rect)) {
                             selectedTower = &t;
                             break;
                         }
@@ -275,7 +294,7 @@ int main(int argc, char *argv[]) {
             }
             // sprawdzanie kolizji
             // Przechodzimy przez każdy obiekt w wektorze (używamy referencji & żeby nie kopiować)
-         checkCollisions();
+            checkCollisions();
             // wychodzenie z gry
             if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_ESCAPE) {
@@ -284,60 +303,54 @@ int main(int argc, char *argv[]) {
             }
             // robi update renderu przycisku
             uiButton.update(renderer, e, current_tower);
-         uiEkonomia.update(renderer);
+            uiEkonomia.update(renderer);
         }
-        if (inputBox.isConfirmed())
-            {
-                spawnTower(
-                inputBox.getX(),
-                inputBox.getY(),
-                current_tower,
-                inputBox.getText()
-            );
-            inputBox.reset();
-            }
+
+        // if (inputBox.isConfirmed())
+        //     {
+        //         spawnTower(
+        //         inputBox.getX(),
+        //         inputBox.getY(),
+        //         current_tower,
+        //         inputBox.getText()
+        //     );
+        //     inputBox.reset();
+        //     }
         // -------------- render --------------
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background_texture, nullptr, nullptr);
 
-        for (auto& t : towers) {
-         SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
-         t.update();
+        for (auto &t: towers) {
+            SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
+            t.update();
         }
-     for (auto& e : enemies) {
-         SDL_RenderCopy(renderer, tower_texture, nullptr, &e.rect);
-         e.update();
-     }
+        for (auto &e: enemies) {
+            SDL_RenderCopy(renderer, tower_texture, nullptr, &e.rect);
+            e.update();
+        }
         notification_manager.render(window);
         notification_manager.update();
         // SDL_RenderCopy(renderer, player_texture, nullptr, &player);
 
         // czyszczenie pamięci po update, bo tam sprawdzamy kolizje
-        std::erase_if(towers, [](const gameObject &t) {
-
-            return t.destroy;
-        });
-        if (selectedTower && selectedTower->destroy)
-         selectedTower = nullptr;
+        gameObjectCleanup();
         // rysuje przycisk
         SDL_Event drawEvent{};
         uiButton.update(renderer, drawEvent, current_tower);
         uiEkonomia.update(renderer);
         inputBox.render(renderer);
-        if (selectedTower)
-        {
-         stats_box.render(
-             renderer,
-             notficiationsTextRenderer,
-             *selectedTower
-         );
-         }
+        if (selectedTower) {
+            stats_box.render(
+                renderer,
+                notficiationsTextRenderer,
+                *selectedTower
+            );
+        }
         SDL_RenderPresent(renderer);
         SDL_Delay(10);
-
-     }
+    }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_Quit();
