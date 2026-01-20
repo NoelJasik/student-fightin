@@ -74,6 +74,8 @@ add_executable(uniProject
         headers/inputBox.h
         klasy/uiStatsBox.cpp
         headers/uiStatsBox.h
+        klasy/gameSettings.cpp
+        headers/gameSettings.h
 )
 
 # --- 4. Dodajemy ścieżki do naszych bibliotek (mam nadzieje że windows to zrozumie) ---

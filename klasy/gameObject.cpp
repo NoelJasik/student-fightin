@@ -6,7 +6,11 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <SDL.h>
+#include <iostream>
+#include "../headers/gameSettings.h"
 
+using namespace gameSettings;
 
 gameObject::gameObject() {
     rect.x = 0;
@@ -17,41 +21,88 @@ gameObject::gameObject() {
     hp = 100;
     update();
 }
-gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage, float _attackspeed) {
-        rect.x = _x;
-        rect.y = _y;
-        rect.w = _w;
-        rect.h = _h;
-        name = _name;
-        attackdamage=_attackdamage;
-        attackspeed=_attackspeed;
-        hp = _hp;
-        update();
+
+gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage,
+                       float _attackspeed) {
+    rect.x = _x;
+    rect.y = _y;
+    rect.w = _w;
+    rect.h = _h;
+    name = _name;
+    attackDamage = _attackdamage;
+    attackForce = _attackspeed;
+    hp = _hp;
+    update();
 }
 
-gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage, float _attackspeed, bool _isEnemy) {
+gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage,
+                       float _attackspeed, bool _isEnemy) {
     rect.x = _x;
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
     name = _name;
     hp = _hp;
-    attackdamage=_attackdamage;
-    attackspeed=_attackspeed;
+    attackDamage = _attackdamage;
+    attackForce = _attackspeed;
     isEnemy = _isEnemy;
     update();
 }
 
+gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage,
+                       float _attackspeed, bool _isEnemy, float _maxSpeedX, float _maxSpeedY) {
+    rect.x = _x;
+    rect.y = _y;
+    rect.w = _w;
+    rect.h = _h;
+    name = _name;
+    hp = _hp;
+    attackDamage = _attackdamage;
+    attackForce = _attackspeed;
+    isEnemy = _isEnemy;
+    setMaxMoveSpeed(_maxSpeedY, _maxSpeedX);
+    // setCurrentMoveSpeed(_maxSpeedY, _maxSpeedX);
+    update();
+}
 
 
 void gameObject::moveBySpeed() {
-    rect.x += xSpeed;
-    rect.y += ySpeed;
+    float deltaTime = static_cast<float>(SDL_GetTicks64() - lastUpdateTime) / 1000.0f;
+
+    // TODO Naprawić to przyśpieszenie
+    // Przyśpieszenie dla osi X
+    if (maxXSpeed >= 0) { // Poruszanie w prawo lub brak ruchu
+       if (currentXSpeed < maxXSpeed) {
+           currentXSpeed += accelearationSpeed * deltaTime;
+       } else {
+           currentXSpeed = maxXSpeed;
+       }
+    } else { // Poruszanie w lewo (maxXSpeed jest ujemne)
+        if (currentXSpeed > maxXSpeed) {
+            currentXSpeed -= accelearationSpeed * deltaTime;
+        }
+        else {
+            currentXSpeed = maxXSpeed;
+        }
+    }
+    // std::cout<< currentXSpeed << " " << name << std::endl;
+
+    // Aktualizacja
+    // std::cout << (currentXSpeed * deltaTime * 100) << std::endl; // debug
+    rect.x += static_cast<int>(currentXSpeed * 10); // skalujemy na pixele
+    rect.y += static_cast<int>(currentYSpeed * 10); // skalujemy na pixele
+    lastUpdateTime = SDL_GetTicks64();
 }
 
-void gameObject::setMoveSpeed(int _ySpeed, int _xSpeed) {
-    ySpeed = _ySpeed;
-    xSpeed = _xSpeed;
+
+void gameObject::setMaxMoveSpeed(float _ySpeed, float _xSpeed) {
+    maxXSpeed = _xSpeed;
+    maxYSpeed = _ySpeed;
+}
+
+void gameObject::setCurrentMoveSpeed(float _ySpeed, float _xSpeed) {
+    currentYSpeed = _ySpeed;
+    currentXSpeed = _xSpeed;
 }
 
 float gameObject::getDistance(gameObject other) {
@@ -67,11 +118,12 @@ float gameObject::getDistance(gameObject other) {
 float gameObject::calculateDistance(gameObject a, gameObject b) {
     return a.getDistance(b);
 }
-// Metoda zwraca listę wskaźników na obiekty, z którymi ten konkretny obiekt koliduje
-std::vector<gameObject*> gameObject::checkCollisions(std::vector<gameObject>& others) {
-    std::vector<gameObject*> collidedObjects;
 
-    for (auto& obj : others) {
+// Metoda zwraca listę wskaźników na obiekty, z którymi ten konkretny obiekt koliduje
+std::vector<gameObject *> gameObject::checkCollisions(std::vector<gameObject> &others) {
+    std::vector<gameObject *> collidedObjects;
+
+    for (auto &obj: others) {
         // Sprawdź, czy nie sprawdzamy kolizji z samym sobą, po adresie w pamięci
         if (this == &obj) {
             continue;
@@ -88,23 +140,30 @@ std::vector<gameObject*> gameObject::checkCollisions(std::vector<gameObject>& ot
     return collidedObjects;
 }
 
+void gameObject::combatWith(gameObject &enemy) {
+    enemy.setCurrentMoveSpeed(0, 0);
+    enemy.rect.x += 20;
+    enemy.hp -= attackDamage;
+    hp -= enemy.attackDamage;
+}
+
 
 // wywoływane co klatkę
 void gameObject::update() {
-   moveBySpeed();
+    moveBySpeed();
     if (hp <= 0) {
         destroy = true;
     }
 
     // prosta logika usuwania poza ekranem
-    if (rect.x > 2000 || rect.x < -500) {
+
+
+    if (!isEnemy) {
+        // Usuwamy jednostki gracza poza ekranem, tej samej logiki się użyje do hp wieży
+        if (rect.x > ScreenSize::getWidth() || rect.x < -100) {
+            destroy = true;
+        }
+    } else if (rect.x < -10) {
         destroy = true;
     }
-
-    if(!isEnemy) {
-
-    }
 }
-
-
-

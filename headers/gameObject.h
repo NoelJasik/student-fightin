@@ -9,27 +9,35 @@
 
 class gameObject {
 // robie wszystko publiczne bo mam wywalone w optymalizacje, a do debugowania/pracy jest łatwiej
+private:
+    float lastUpdateTime;
 public:
     SDL_Rect rect{0,0,0,0};
     std::string name;
     float hp;
-    float ySpeed = 0;
-    float xSpeed = 0;
-    float attackdamage;
-    float attackspeed;
+    float maxYSpeed = 0;
+    float maxXSpeed = 0;
+    float attackDamage;
+    float attackForce;
+    float currentYSpeed = 0;
+    float currentXSpeed = 0;
+    float accelearationSpeed = 0.05f;
     bool isEnemy = false;
     // jak jest true to usuwamy z listy obiektów
     bool destroy = false;
     gameObject();
-    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float attackdamage, float attackspeed);
-    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float attackdamge, float attackspeed, bool _isEnemy);
-
+    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce);
+    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy);
+    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY);
     void moveBySpeed();
-    void setMoveSpeed(int _ySpeed, int _xSpeed);
+    void setCurrentMoveSpeed(float _ySpeed, float _xSpeed);
+    void setMaxMoveSpeed(float _ySpeed, float _xSpeed);
     void update();
     float getDistance(gameObject other);
     static float calculateDistance(gameObject a, gameObject b);
-    std::vector<gameObject*> checkCollisions(std::vector<gameObject>& others);
+    void combatWith(gameObject &enemy);
+
+    std::vector<gameObject*> checkCollisions(std::vector<gameObject> &others);
 };
 
 #endif //UNIPROJECT_GAMEOBJECT_H
