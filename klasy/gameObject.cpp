@@ -17,23 +17,27 @@ gameObject::gameObject() {
     hp = 100;
     update();
 }
-gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp) {
+gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage, float _attackspeed) {
         rect.x = _x;
         rect.y = _y;
         rect.w = _w;
         rect.h = _h;
         name = _name;
+        attackdamage=_attackdamage;
+        attackspeed=_attackspeed;
         hp = _hp;
         update();
 }
 
-gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, bool _isEnemy) {
+gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage, float _attackspeed, bool _isEnemy) {
     rect.x = _x;
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
     name = _name;
     hp = _hp;
+    attackdamage=_attackdamage;
+    attackspeed=_attackspeed;
     isEnemy = _isEnemy;
     update();
 }
