@@ -3,7 +3,7 @@
 //
 
 #include "../headers/inputBox.h"
-#include "../headers/textRenderer.h"
+#include "../headers/TextRenderer.h"
 
 // proste rounded rect
 static void drawBackground(SDL_Renderer* renderer, const SDL_Rect& r)

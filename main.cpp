@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 
 
     SDL_CreateWindowAndRenderer(ScreenSize::getWidth(), ScreenSize::getHeight(), 0, &window, &renderer);
-    TextRenderer notficiationsTextRenderer(renderer, "assets/PlayWriteCU-Regular.ttf", 16);
+    TextRenderer notficiationsTextRenderer(renderer, "assets/GravitasOne-Regular.ttf", 16);
     InputBox inputBox(&notficiationsTextRenderer);
     // Dałem statyczne, bo to jest tło
     auto background_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, ScreenSize::getWidth(),
