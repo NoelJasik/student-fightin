@@ -1,60 +1,42 @@
 # Student-fightin' (no bo ballin już nie pasuje)
-Pomysł gry, to taki rts/tower defence gdzie przeciągamy na plansze studentów i bronią agh przed kibolami klubu rks chuwdu :)
-![design.png](assets/design.png)  
 ## Ogólny plan realizacji
-Najpierw skupiamy się na stworzeniu mvp (minimal viable product), czyli prosty prototyp żeby to wgl działało. Potem jak nam zostanie czasu można te mechaniki rozwniąć, ale lepiej planować że nam tego czasu nie zostanie.
-ciężko też tak na sucho grę wymyśleć, dużo się pewnie zmieni jak chodzi o gameplay w trakcie testów
-Paczki typu sdl2, openGl proszę importować przez FetchContent i vcpkg (jako fallback), żeby to działało cross platform.
-nie wrzucajcie całych bibliotek do repozytorium
+Zrobić grę taką w którą da się grać, vibe starych gier na flashu.
+Pomysł gry, to taki rts/tower defence gdzie przeciągamy na plansze studentów i bronią agh przed kibolami klubu rks chuwdu :)
+![design.png](assets/design.png)
+## mechaniki do zaimplementowania
+ (osobne kategorie, kolejność priortetów od góry do dołu)
+### Gameplay
+- Hp dla budynku AGH
+- Studenci chodzą jak npc, zamiast stać jak słup
+- jednostki nie przenikają przez siebie nawzajem, tylko się odbijają
+- Animacja rozwalania jednostek (wybuchy, kawałki lecące w powietrze)
+- Regeneracja zdrowia jednostek
+- Komunikaty o rozpoczęciu i zakończeniu fali
+- Efekty podczas walki (dźwięki, cząsteczki itp)
 
-## Tech stack
-OpenGL + SDL2 + CMake + C++
+### GUI/UX
+- Wyświetlanie HP budynku AGH
+- pasek hp nad rannymi jednostkami
+- Renderowanie jednostki w szarym kolorze przed jej postawieniem, i na czerwono jak sie nie da jej postawić
+- Podstawowy polish (efekty dźwiękowe, muzyka w tle)
 
-## Design doc 
-### mechaniki (do mvp)
-- Zadaniem gracza jest obrona budynku agh przed kibolami, gracz widzi całą planszę z lotu ptaka
-- Gracz przeciąga na plansze postacie/obiekty, może je wrzucić w dowolny obszar po lewej połowie ekranu (bo na całej mapce zbyt op imo)
-- Do dyspozycji mamy 3 (lub więcej ale to trzeba wymyśleć) typy jednostek. każda jednostka powinna być unikatowa a nie po prostu reskin z lepszymi statami
-  - student - podchodzi do kibola i się z nim bije (jak w tej gierce rycerze https://youtu.be/EvEGuTAsYp4?si=GamT-wYS7684qhyB&t=8)
-  - Koparka - wrzucamy na plansze i po prostu jedzie przed siebie, taranuje wszystkich na drodze
-  - działko - jeżeli w pobliżu znajduje się kibol, to do niego strzela
-- Ai kiboli działa tak, idą w lewo, dookoła każdego z nich jest niewidzalne kółko, jak w tym kółku wykryją jakąś postać od gracza to podchodzą i się z nim biją, jak nie to biegną w stronę agh
-- Budynek agh ma swoje hp, kibole go stopniowo ubijają, jak spadnie do zera to przegrywamy
-- Gra spawnuje kiboli losowo, musimy przeżyć np 5 minut (jeżeli będzie czas, zrobiłbym to na fale, tak jak w małpkach gdzie każda fala ma określonych przeciwników i ich układ a nie losowo)
-### mechaniki (dodatkowe)
-- Rozgrywka na fale
-  - pomiędzy falami można kupić/ulepszyć jednostki
-  - każda fala ma inny układ przeciwników
-- Różne typy przeciwników
-  - ze sprzętem, bije naszych bronią białą
-  - z klamką, strzela do naszych w pobliżu
-  - można porobić reskiny że np więcej hp, więcej speedu itd
-- Ustawienia
-- Sklepik studenciak gdzie można kupować/wybrać jedno za free ulepszenia/e do jednostek pomiędzy falami
-- intro i menusy
+### Menusy
+- Instrukcje na ekranie (jak grać, jakie klawisze, najlepiej obrazki a nie ściana tekstu, bo tego nikt nigdy nie czyta xd)
+- Menu główne z ustawieniami (zmiana rozdzielczości poprzez skalowanie okna z gameplayem, bo fizyka obliczana jest w pixelach, podobno się tak da w SDL2)
+- Ekran pauzy
+- Ekran końca gry (wygrana/przegrana)
 
-### lore possibly
+### Ekonomia
+- Siano za zabijanie przeciwników
+- Budynki dodają nam pasywnie hajs (jednostka 3)
+- Hajs na start i rozpoczęcie fali
+- Sprzedawanie jednostek
+- Ulepszanie bazowych jednostek (że wszystkie jednostki które postawimy, odrazu są ulepszone, była by to droższa opcja)
+
+
+
+### lore
 kartka w zeszycie znudzonego studenta na 6 godzinie fizyki
 ### artstyle
 Artstyle będzie wyglądał tak jakby gierka była narysowana odręcznie, na kartce w zeszycie.
-
-## Lista tasków 
-
-### MVP:
-- [x] Ogarnięcie SDL2 i konfiguracja builda przez FetchContent / vcpkg
-- [ ] Rendering pipeline (SDL2 + OpenGL): prosty sprite renderer, kamera pokazująca całą planszę
-- [ ] Input & UI: przeciąganie i upuszczanie jednostek ograniczone do prawej połowy ekranu (Prototyp jest gotowy!)
-- [ ] Podstawowe jednostki: Student (melee), Koparka (ram/vehicle), Działko (ranged)
-- [ ] Prosta AI przeciwników: idą w lewo, wykrywają jednostki gracza i wchodzą w walkę
-- [ ] Spawner: generowanie przeciwników w czasie z prostym harmonogramem trudności
-- [ ] Budynek agh z HP, obsługa obrażeń i warunek przegranej
-- [ ] Podstawowe kolizje i interakcje: uderzenia jednostek, pociski, podstawowe reakcje
-
-### Jeżeli zostanie czasu:
-- [ ] System fal z predefiniowanymi wave'ami i pacingiem
-- [ ] Sklep/ulepszenia między falami (np. jedna darmowa opcja)
-- [ ] Dodatkowe typy przeciwników (ze sprzętem, strzelający, szybcy)
-- [ ] Przeszkody i elementy mapy (kolce, ściany)
-- [ ] Audio: efekty dźwiękowe i muzyka w tle
-- [ ] Menu główne, ekran pauzy i podstawowy polish
 
