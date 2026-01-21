@@ -14,6 +14,9 @@ private:
 public:
     SDL_Rect rect{0,0,0,0};
     std::string name;
+    // Pozycję do przemieszczania się
+    float trueXPos;
+    float trueYPos;
     int lvl;
     float hp;
     float maxYSpeed = 0;
@@ -31,7 +34,10 @@ public:
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy);
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY);
     void moveBySpeed();
-    void setCurrentMoveSpeed(float _ySpeed, float _xSpeed);
+
+void moveToPoint(int _x, int _y);
+
+void setCurrentMoveSpeed(float _ySpeed, float _xSpeed);
     void setMaxMoveSpeed(float _ySpeed, float _xSpeed);
     void update();
     float getDistance(gameObject other);

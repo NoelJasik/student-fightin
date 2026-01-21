@@ -29,6 +29,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    trueXPos = _x;
+    trueYPos = _y;
     name = _name;
     attackDamage = _attackdamage;
     attackForce = _attackspeed;
@@ -42,6 +44,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    trueXPos = _x;
+    trueYPos = _y;
     name = _name;
     hp = _hp;
     attackDamage = _attackdamage;
@@ -57,6 +61,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    trueXPos = _x;
+    trueYPos = _y;
     name = _name;
     hp = _hp;
     attackDamage = _attackdamage;
@@ -91,9 +97,15 @@ void gameObject::moveBySpeed() {
 
     // Aktualizacja
     // std::cout << (currentXSpeed * deltaTime * 100) << std::endl; // debug
-    rect.x += static_cast<int>(currentXSpeed * 10); // skalujemy na pixele
-    rect.y += static_cast<int>(currentYSpeed * 10); // skalujemy na pixele
+    trueXPos += currentXSpeed;
+    trueYPos += currentYSpeed;
+    moveToPoint(trueXPos, trueYPos);
     lastUpdateTime = SDL_GetTicks64();
+}
+
+void gameObject::moveToPoint(int _x, int _y) {
+rect.x = _x - rect.w / 2;
+    rect.y = _y - rect.h / 2;
 }
 
 
@@ -143,8 +155,7 @@ std::vector<gameObject *> gameObject::checkCollisions(std::vector<gameObject> &o
 }
 
 void gameObject::combatWith(gameObject &enemy) {
-    enemy.setCurrentMoveSpeed(0, 0);
-    enemy.rect.x += 20;
+    enemy.setCurrentMoveSpeed(0,  attackForce);
     enemy.hp -= attackDamage;
     hp -= enemy.attackDamage;
 }
