@@ -142,6 +142,8 @@ void gameObjectCleanup() {
 }
 
 
+
+
 int main(int argc, char *argv[]) {
     // Sprawdzanie errorów
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -287,14 +289,18 @@ int main(int argc, char *argv[]) {
 
             // stawianie wieży w pozycji kursora
             if (e.type == SDL_MOUSEBUTTONDOWN) {
+                int kosztjednostki = 0;
                 // można stawiać tylko w lewej połowie ekranu
                 int towerHeight = 0;
                 switch (current_tower) {
                     case 1: towerHeight = 90;
+                        kosztjednostki = 20;
                         break;
                     case 2: towerHeight = 200;
+                        kosztjednostki = 50;
                         break;
                     case 3: towerHeight = 100;
+                        kosztjednostki = 25;
                         break;
                 }
                 if (e.button.button == SDL_BUTTON_LEFT &&
@@ -331,6 +337,7 @@ int main(int argc, char *argv[]) {
                     if (can_be_placed == true && current_tower != 0) {
                         selectedTower = nullptr;
                         // inputBox.open(e.button.x, e.button.y, current_tower);
+                        uiEkonomia.odejmowanie(uiEkonomia.getMoney(), kosztjednostki);//tutaj wjebać odejmowanie kasy
                         spawnTower(
                             e.button.x,
                             e.button.y,
