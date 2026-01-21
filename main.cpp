@@ -12,20 +12,17 @@
 #include "ekonomia.h"
 #include "headers/uiStatsBox.h"
 #include "headers/gameSettings.h"
-
+#include "headers/topBar.h"
 using namespace std;
 // Można wyciągnąć z tego klase screensize
 using namespace gameSettings;
-
+int currentWave=1;
 vector<gameObject> towers;
 vector<gameObject> enemies;
 
 // ------ GRAFIKI ------
 SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
-
 // TODO - wrzucić to do klasy żeby się dało łatwo pobierać
-// daje jako zmienne bo w obliczeniach się przyda
-
 uiStatsBox stats_box;
 gameObject *selectedTower = nullptr;
 
@@ -137,7 +134,7 @@ int main(int argc, char *argv[]) {
     SDL_Rect player{10, 10, 10, 20};
     // 0 - brak 1 - piechota 2 - killdozer 3 - działko
     int current_tower = 0;
-
+    topBar topBar(ScreenSize::getWidth());
 
     SDL_CreateWindowAndRenderer(ScreenSize::getWidth(), ScreenSize::getHeight(), 0, &window, &renderer);
     TextRenderer notficiationsTextRenderer(renderer, "assets/GravitasOne-Regular.ttf", 16);
@@ -212,8 +209,8 @@ int main(int argc, char *argv[]) {
             // if (inputBox.isActive())
             //  continue;
             bool uiConsumed = false;
-
-            if (selectedTower) {
+            uiConsumed = topBar.handleEvent(e, current_tower);
+            if (!uiConsumed && selectedTower) {
                 uiConsumed = stats_box.handleEvent(e, *selectedTower, notification_manager);
             }
 
@@ -248,9 +245,16 @@ int main(int argc, char *argv[]) {
             // stawianie wieży w pozycji kursora
             if (e.type == SDL_MOUSEBUTTONDOWN) {
                 // można stawiać tylko w lewej połowie ekranu
-                if (e.button.button == SDL_BUTTON_LEFT && e.button.x <= ScreenSize::getWidth() / 2 && current_tower !=
-                    0) {
-                    //zapobieganie kolizji jednostek Mateusz 16.12
+                int towerHeight = 0;
+                switch (current_tower) {
+                    case 1: towerHeight = 90; break;
+                    case 2: towerHeight = 200; break;
+                    case 3: towerHeight = 100; break;
+                }
+                if (e.button.button == SDL_BUTTON_LEFT &&
+                    e.button.x <= ScreenSize::getWidth() / 2 &&
+                    current_tower != 0 &&
+                    e.button.y - towerHeight / 2 >= topBar.rect.h) { //sprawdzenie czy nie nachodzi na topbar
                     double distance = 0; // zmienne do przechowywania dystansu i czy jednsotka moze byc postawiona
                     float can_be_placed = true;
                     if (current_tower == 1) {
@@ -311,7 +315,6 @@ int main(int argc, char *argv[]) {
                 }
             }
             // robi update renderu przycisku
-            uiButton.update(renderer, e, current_tower);
             uiEkonomia.update(renderer);
         }
 
@@ -335,7 +338,7 @@ int main(int argc, char *argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background_texture, nullptr, nullptr);
-
+        topBar.render(renderer,current_tower, uiEkonomia.getMoney(), notficiationsTextRenderer, currentWave);
         for (auto &t: towers) {
             SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
             t.update();
@@ -352,7 +355,6 @@ int main(int argc, char *argv[]) {
         gameObjectCleanup();
         // rysuje przycisk
         SDL_Event drawEvent{};
-        uiButton.update(renderer, drawEvent, current_tower);
         uiEkonomia.update(renderer);
         inputBox.render(renderer);
         if (selectedTower) {
