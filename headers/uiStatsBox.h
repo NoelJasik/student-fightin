@@ -7,10 +7,15 @@
 #include <gameObject.h>
 #include <SDL.h>
 #include "TextRenderer.h"
+#include "notification.h"
 class uiStatsBox {
 public:
-    static void render(SDL_Renderer* renderer,
-                       TextRenderer& text,
-                       const gameObject& obj);
+    SDL_Rect lvlUpButton;
+
+    void render(SDL_Renderer* renderer,
+                TextRenderer& text,
+                gameObject& obj);
+
+    bool handleEvent(const SDL_Event& e, gameObject& obj, NotificationManager& notification_manager);
 };
 #endif //UNIPROJECT_UISTATSBOX_H

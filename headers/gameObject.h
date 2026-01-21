@@ -17,6 +17,7 @@ public:
     // Pozycję do przemieszczania się
     float trueXPos;
     float trueYPos;
+    int lvl;
     float hp;
     float maxYSpeed = 0;
     float maxXSpeed = 0;
