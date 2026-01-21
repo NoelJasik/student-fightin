@@ -102,8 +102,8 @@ void gameObject::moveBySpeed() {
 }
 
 void gameObject::moveToPoint(int _x, int _y) {
-rect.x = _x;
-    rect.y = _y;
+rect.x = _x - rect.w / 2;
+    rect.y = _y - rect.h / 2;
 }
 
 
