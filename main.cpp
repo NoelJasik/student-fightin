@@ -20,6 +20,79 @@ int currentWave = 1;
 vector<gameObject> towers;
 vector<gameObject> enemies;
 
+// ------ MENU -------
+int showmenu(SDL_Renderer* renderer, TextRenderer* textRenderer) {
+if(!renderer || !textRenderer) {
+    std::cerr << "Renderer or TextRenderer is null!" << std::endl;
+    return -1;
+}
+    const int NumMenu = 2;
+    const char* labels[NumMenu] = {"Continue", "Exit"};
+    bool selected[NumMenu]={false, false};
+    SDL_Color colors[2] = {{255,255,255},{255,0,0}};
+
+    int screenW, screenH;
+    SDL_GetRendererOutputSize(renderer, &screenW, &screenH);
+
+    int textW[NumMenu], textH[NumMenu];
+    for (int i =0;i<NumMenu;i++) {
+        textRenderer->measure(labels[i], textW[i], textH[i]);
+    }
+    SDL_Rect pos[NumMenu];
+    pos[0].x=screenW/2 - textW[0]/2;
+    pos[0].y=screenH/2 - textH[0];
+    pos[1].x=screenW/2 - textW[1]/2;
+    pos[1].y=screenH/2 + textH[1];
+
+    SDL_Event menuevent;
+    while(true)
+    {
+        while (SDL_PollEvent(&menuevent))
+            {
+                switch(menuevent.type) {
+                    case SDL_QUIT:
+                        return 1;
+                    case SDL_MOUSEMOTION: {
+                        int x = menuevent.motion.x;
+                        int y = menuevent.motion.y;
+                        for (int i=0;i<NumMenu;i++) {
+                            selected[i] = (x>=pos[i].x && x<=pos[i].x+textW[i] && y>=pos[i].y && y<=pos[i].y+textH[i]);
+
+                        }
+                        break;
+                    }
+                    case SDL_MOUSEBUTTONDOWN: {
+                        int x = menuevent.button.x;
+                        int y = menuevent.button.y;
+                        for (int i = 0; i < NumMenu; i++) {
+                            if (x >= pos[i].x && x <= pos[i].x + textW[i] &&
+                                y >= pos[i].y && y <= pos[i].y + textH[i]) {
+                                return i;
+                                }
+                        }
+                        break;
+                    }
+
+
+                    case SDL_KEYDOWN:
+                        if (menuevent.key.keysym.sym == SDLK_ESCAPE) {
+                            return 0;
+                        }
+                        break;
+                    }
+            }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        for (int i = 0; i < NumMenu; i++) {
+            textRenderer->render(labels[i],pos[i].x, pos[i].y, colors[selected[i] ? 1 : 0]);
+        }
+        SDL_RenderPresent(renderer);
+        SDL_Delay(10);
+        }
+    return 0;
+}
+
+
 // ------ GRAFIKI ------
 SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
 SDL_Surface *TTF_RenderText_Solid(TTF_Font *font, const char *str, int fg, SDL_Color sdl_color);
@@ -160,6 +233,7 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
     SDL_Init(SDL_INIT_EVERYTHING);
     bool running = true;
+    bool isPaused = false;
     SDL_Rect player{10, 10, 10, 20};
     // 0 - brak 1 - piechota 2 - killdozer 3 - działko
     int current_tower = 0;
@@ -276,8 +350,20 @@ int main(int argc, char *argv[]) {
                         break;
                     case SDLK_9:
                         current_tower = 0;
+                        break;
                     case SDLK_q:
                         startWave();
+                        break;
+                    case SDLK_p:
+                        isPaused = true;
+                        int menuresult = showmenu(renderer, &notficiationsTextRenderer);
+                        std::cout << "Menu result: " << menuresult << std::endl;
+                        if (menuresult == 1) {
+                            std::cout << "Setting running = false" << std::endl;
+                            running = false;
+                        }
+                        isPaused = false;
+                        break;
                 }
 
 
