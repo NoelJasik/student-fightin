@@ -25,7 +25,10 @@ public:
     float attackForce;
     float currentYSpeed = 0;
     float currentXSpeed = 0;
-    float accelearationSpeed = 0.05f;
+    // w m/s^2
+    float accelerationSpeed = 0.05f;
+    // w kg
+    float mass = 1;
     bool isEnemy = false;
     // jak jest true to usuwamy z listy obiektów
     bool destroy = false;
@@ -33,6 +36,7 @@ public:
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce);
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy);
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY);
+    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass);
     void moveBySpeed();
 
 void moveToPoint(int _x, int _y);

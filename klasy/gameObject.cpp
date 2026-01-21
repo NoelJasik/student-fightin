@@ -73,25 +73,56 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     update();
 }
 
+gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage,
+                       float _attackspeed, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass) {
+    lvl=1;
+    rect.x = _x;
+    rect.y = _y;
+    rect.w = _w;
+    rect.h = _h;
+    trueXPos = _x;
+    trueYPos = _y;
+    name = _name;
+    hp = _hp;
+    attackDamage = _attackdamage;
+    attackForce = _attackspeed;
+    isEnemy = _isEnemy;
+    accelerationSpeed = _accelerationSpeed;
+    mass = _mass;
+    setMaxMoveSpeed(_maxSpeedY, _maxSpeedX);
+    // setCurrentMoveSpeed(_maxSpeedY, _maxSpeedX);
+    update();
+}
+
+
 
 void gameObject::moveBySpeed() {
     float deltaTime = static_cast<float>(SDL_GetTicks64() - lastUpdateTime) / 1000.0f;
 
-    // TODO Naprawić to przyśpieszenie
     // Przyśpieszenie dla osi X
-    if (maxXSpeed >= 0) { // Poruszanie w prawo lub brak ruchu
+    if (maxXSpeed > 0) { // Poruszanie w prawo lub brak ruchu
        if (currentXSpeed < maxXSpeed) {
-           currentXSpeed += accelearationSpeed * deltaTime;
+           currentXSpeed += accelerationSpeed * mass * deltaTime;
        } else {
            currentXSpeed = maxXSpeed;
        }
-    } else { // Poruszanie w lewo (maxXSpeed jest ujemne)
+    }
+    else if (maxXSpeed < 0) { // Poruszanie w lewo (maxXSpeed jest ujemne)
         if (currentXSpeed > maxXSpeed) {
-            currentXSpeed -= accelearationSpeed * deltaTime;
+            currentXSpeed -= accelerationSpeed * mass * deltaTime;
         }
         else {
             currentXSpeed = maxXSpeed;
         }
+    } else if (maxXSpeed == 0) {
+        if (currentXSpeed > 0.001f) {
+            currentXSpeed -= accelerationSpeed * mass * deltaTime;
+        } else if (currentXSpeed < -0.001f) {
+            currentXSpeed += accelerationSpeed * mass * deltaTime;
+        } else {
+            currentXSpeed = 0;
+        }
+
     }
     // std::cout<< currentXSpeed << " " << name << std::endl;
 

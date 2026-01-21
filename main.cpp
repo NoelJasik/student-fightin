@@ -50,14 +50,14 @@ void spawnTower(int _x, int _y, int _type) {
         default:
             return;
         case 1:
-            tower = gameObject(_x, _y, 50, 90, "Student", 100, 10, 1.0);
+            tower = gameObject(_x, _y, 50, 90, "Student", 100, 10, 1.0, false, 0, 0, 0.05f, 60);
             break;
         case 2:
-            tower = gameObject(_x, _y, 100, 200, "Koparka", 100, 10, 1.0);
+            tower = gameObject(_x, _y, 100, 200, "Koparka", 100, 10, 1.0, false, 0, 0, 0.05f, 60);
             tower.setMaxMoveSpeed(0, 10);
             break;
         case 3:
-            tower = gameObject(_x, _y, 100, 100, "Studenciak (budynek)", 150, 10, 1.0);
+            tower = gameObject(_x, _y, 100, 100, "Studenciak (budynek)", 150, 10, 1.0, false, 0, 0, 0.05f, 0);
             break;
     }
     // wycentrowanie
@@ -76,7 +76,7 @@ void spawnTower(int _x, int _y, int _type) {
 void startWave(int _enemyCount, int _enemySpread) {
     for (int i = 0; i < _enemyCount; i++) {
         gameObject enemy = gameObject(ScreenSize::getWidth() + rand() % _enemySpread, rand() % ScreenSize::getHeight(),
-                                      50, 90, "Enemy", 50, 10, 1.0, true, -0.5f, 0);
+                                      50, 90, "Enemy", 50, 10, 1.0, true, -0.5f, 0, 0.02f, 70);
         enemies.push_back(enemy);
     }
 }
