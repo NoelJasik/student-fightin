@@ -60,7 +60,7 @@ void spawnTower(int _x, int _y, int _type) {
             tower.setMaxMoveSpeed(0, 10);
             break;
         case 3:
-            tower = gameObject(_x, _y, 100, 100, "Studenciak (budynek)", 150, 10, 1.0, false, 0, 0, 0.05f, 0);
+            tower = gameObject(_x, _y, 100, 100, "Duet", 150, 10, 1.0, false, 0, 0, 0.05f, 0);
             break;
     }
     // wycentrowanie
@@ -76,13 +76,37 @@ void spawnTower(int _x, int _y, int _type) {
 }
 
 // Logika odpalania fal i spawnowania przeciwników
-void startWave(int _enemyCount, int _enemySpread) {
+void startWave() {
+    const int _enemyCount = 10 + (currentWave - 1) * 2;
+    const int _enemySpread = 500 + (currentWave - 1) * 50;
     for (int i = 0; i < _enemyCount; i++) {
-        gameObject enemy = gameObject(ScreenSize::getWidth() + rand() % _enemySpread,
-            (rand() % ScreenSize::getHeight()) + 120,
-                                      50, 90, "Enemy", 50, 10, 1.0, true, -2.0f, 0, 0.02f, 70);
+        float basePower = 1.0f + (currentWave - 1) * 0.1f;
+        float rnd = static_cast<float>(rand()) / static_cast<float>(RAND_MAX); // 0..1
+        float randomScale = 0.85f + rnd * 0.3f; // ~0.85 .. 1.15
+        float power = basePower * randomScale;
+
+        int w = static_cast<int>(50 * power);
+        int h = static_cast<int>(90 * power);
+        if (w < 20) w = 20;
+        if (h < 30) h = 30;
+        if (w > 200) w = 200;
+        if (h > 300) h = 300;
+
+        int hp = static_cast<int>(50 * power);
+        int dmg = static_cast<int>(10 * power);
+
+        float baseSpeed = 2.0f;
+        float velX = - (baseSpeed / power);
+        if (velX < -6.0f) velX = -6.0f;
+        if (velX > -0.5f) velX = -0.5f;
+
+        gameObject enemy = gameObject(
+            ScreenSize::getWidth() + rand() % _enemySpread,
+            (rand() % (ScreenSize::getHeight() - 120)) + 120,
+            w, h, "Enemy", hp, dmg, power, true, velX, 0, 0.02f, 70);
         enemies.push_back(enemy);
     }
+    currentWave++;
 }
 
 // TODO zrobić żeby to sie wyświetlało co X ticków, żeby łatwiej się testowało garbage collector.
@@ -251,7 +275,7 @@ int main(int argc, char *argv[]) {
                     case SDLK_9:
                         current_tower = 0;
                     case SDLK_q:
-                        startWave(1000, 100000);
+                        startWave();
                 }
 
 

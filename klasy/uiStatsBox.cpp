@@ -15,10 +15,10 @@ void uiStatsBox::render(SDL_Renderer* renderer,
 {
     const int PADDING = 6;
 
-    std::string title = obj.name + "  LVL." + std::to_string(obj.lvl);
+    std::string title = obj.name + "  SEM." + std::to_string(obj.lvl);
     std::string line1 = "HP:  " + roundToString(obj.hp, 1);
     std::string line2 = "DMG: " + roundToString(obj.attackDamage, 1);
-    std::string line3 = "AS: "  + roundToString(obj.attackForce, 2);
+    std::string line3 = "MOC: "  + roundToString(obj.attackForce, 2);
 
     int wt, ht, w1, h1, w2, h2, w3, h3;
     text.measure(title, wt, ht);
