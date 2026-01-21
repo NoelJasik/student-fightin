@@ -83,16 +83,10 @@ bool uiStatsBox::handleEvent(const SDL_Event& e, gameObject& obj, NotificationMa
                 notification_manager.add("Maksymalny lvl jednostki to 8");
 
             }else if(obj.lvl+1==8){
-                obj.lvl++;
-                obj.hp=obj.hp+80;
-                obj.attackDamage=obj.attackDamage+17;
-                obj.attackForce=obj.attackForce+0.4;
+                obj.levelUp();
             }
             else {
-                obj.hp=obj.hp+20;
-                obj.attackDamage=obj.attackDamage+5.5;
-                obj.attackForce=obj.attackForce+0.1;
-                obj.lvl += 1;
+                obj.levelUp();
             }
             return true;
         }

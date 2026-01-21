@@ -21,6 +21,8 @@ public:
     float hp;
     float maxYSpeed = 0;
     float maxXSpeed = 0;
+    float startPosX = 0;
+    float startPosY = 0;
     float attackDamage;
     float attackForce;
     float currentYSpeed = 0;
@@ -50,7 +52,9 @@ void setCurrentMoveSpeed(float _ySpeed, float _xSpeed);
     static float calculateDistance(gameObject a, gameObject b);
     void combatWith(gameObject &enemy);
 
-    std::vector<gameObject*> checkCollisions(std::vector<gameObject> &others);
+void levelUp();
+
+std::vector<gameObject*> checkCollisions(std::vector<gameObject> &others);
 };
 
 #endif //UNIPROJECT_GAMEOBJECT_H

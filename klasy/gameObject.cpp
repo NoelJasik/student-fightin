@@ -29,6 +29,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startPosX = _x;
+    startPosY = _y;
     trueXPos = _x;
     trueYPos = _y;
     name = _name;
@@ -40,10 +42,13 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
 
 gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage,
                        float _attackspeed, bool _isEnemy) {
+    lvl=1;
     rect.x = _x;
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startPosX = _x;
+    startPosY = _y;
     trueXPos = _x;
     trueYPos = _y;
     name = _name;
@@ -61,6 +66,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startPosX = _x;
+    startPosY = _y;
     trueXPos = _x;
     trueYPos = _y;
     name = _name;
@@ -80,6 +87,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startPosX = _x;
+    startPosY = _y;
     trueXPos = _x;
     trueYPos = _y;
     name = _name;
@@ -100,6 +109,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startPosX = _x;
+    startPosY = _y;
     trueXPos = _x;
     trueYPos = _y;
     name = _name;
@@ -144,14 +155,15 @@ void gameObject::moveBySpeed() {
             currentXSpeed = maxXSpeed;
         }
     } else if (maxXSpeed == 0) {
-        if (currentXSpeed > 0.001f) {
+        if (trueXPos < startPosX) {
+            currentXSpeed += accelerationSpeed * mass * deltaTime;
+        } else if (currentXSpeed > 0.1f) {
             currentXSpeed -= accelerationSpeed * mass * deltaTime;
-        } else if (currentXSpeed < -0.001f) {
+        } else if (currentXSpeed < -0.1f) {
             currentXSpeed += accelerationSpeed * mass * deltaTime;
         } else {
             currentXSpeed = 0;
         }
-
     }
     // std::cout<< currentXSpeed << " " << name << std::endl;
 
@@ -219,6 +231,21 @@ void gameObject::combatWith(gameObject &enemy) {
     setCurrentMoveSpeed(0, -enemy.attackForce);
     enemy.hp -= attackDamage;
     hp -= enemy.attackDamage;
+}
+
+void gameObject::levelUp() {
+    lvl += 1;
+    if (lvl <= 0) lvl = 1;
+    // malejące przyrosty: im wyższy poziom, tym mniejszy procentowy wzrost
+    float dmgMult = 1.0f + 0.2f / lvl;
+    float forceMult = 1.0f + 0.1f / lvl;
+    float hpMult = 1.0f + 0.3f / lvl;
+    float sizeMult = 1.0f + 0.3f / lvl;
+    attackDamage *= dmgMult;
+    attackForce *= forceMult;
+    hp *= hpMult;
+    rect.h = static_cast<int>(rect.h * sizeMult);
+    rect.w = static_cast<int>(rect.w * sizeMult);
 }
 
 

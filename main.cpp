@@ -84,9 +84,10 @@ void startWave() {
         float rnd = static_cast<float>(rand()) / static_cast<float>(RAND_MAX); // 0..1
         float randomScale = 0.85f + rnd * 0.3f; // ~0.85 .. 1.15
         float power = basePower * randomScale;
+        float sizeScale = 0.7f + rnd * 0.6f; // ~0.7 .. 1.3
 
-        int w = static_cast<int>(50 * power);
-        int h = static_cast<int>(90 * power);
+        int w = static_cast<int>(50 * sizeScale);
+        int h = static_cast<int>(90 * sizeScale);
         if (w < 20) w = 20;
         if (h < 30) h = 30;
         if (w > 200) w = 200;
@@ -94,6 +95,7 @@ void startWave() {
 
         int hp = static_cast<int>(50 * power);
         int dmg = static_cast<int>(10 * power);
+        int attackForce = static_cast<int>(1.0f * power);
 
         float baseSpeed = 2.0f;
         float velX = - (baseSpeed / power);
@@ -103,7 +105,7 @@ void startWave() {
         gameObject enemy = gameObject(
             ScreenSize::getWidth() + rand() % _enemySpread,
             (rand() % (ScreenSize::getHeight() - 120)) + 120,
-            w, h, "Enemy", hp, dmg, power, true, velX, 0, 0.02f, 70);
+            w, h, "Enemy", hp, dmg, attackForce, true, velX, 0, 0.02f, 70 * power);
         enemies.push_back(enemy);
     }
     currentWave++;
