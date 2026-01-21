@@ -93,11 +93,40 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     // setCurrentMoveSpeed(_maxSpeedY, _maxSpeedX);
     update();
 }
+gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage,
+                       float _attackspeed, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass, SDL_Texture* _image) {
+    lvl=1;
+    rect.x = _x;
+    rect.y = _y;
+    rect.w = _w;
+    rect.h = _h;
+    trueXPos = _x;
+    trueYPos = _y;
+    name = _name;
+    hp = _hp;
+    attackDamage = _attackdamage;
+    attackForce = _attackspeed;
+    isEnemy = _isEnemy;
+    accelerationSpeed = _accelerationSpeed;
+    mass = _mass;
+    image = _image;
+    setMaxMoveSpeed(_maxSpeedY, _maxSpeedX);
+    // setCurrentMoveSpeed(_maxSpeedY, _maxSpeedX);
+    update();
+}
+
 
 
 
 void gameObject::moveBySpeed() {
     float deltaTime = static_cast<float>(SDL_GetTicks64() - lastUpdateTime) / 1000.0f;
+
+    // if (deltaTime <= 0) {
+    //     return; // Unikaj dzielenia przez zero lub negatywnego deltaTime
+    // }
+    if (mass == 0) {
+        return;
+    }
 
     // Przyśpieszenie dla osi X
     if (maxXSpeed > 0) { // Poruszanie w prawo lub brak ruchu
@@ -187,6 +216,7 @@ std::vector<gameObject *> gameObject::checkCollisions(std::vector<gameObject> &o
 
 void gameObject::combatWith(gameObject &enemy) {
     enemy.setCurrentMoveSpeed(0,  attackForce);
+    setCurrentMoveSpeed(0, -enemy.attackForce);
     enemy.hp -= attackDamage;
     hp -= enemy.attackDamage;
 }

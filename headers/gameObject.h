@@ -32,11 +32,13 @@ public:
     bool isEnemy = false;
     // jak jest true to usuwamy z listy obiektów
     bool destroy = false;
+    SDL_Texture *image = nullptr;
     gameObject();
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce);
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy);
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY);
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass);
+    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass, SDL_Texture* _image);
     void moveBySpeed();
 
 void moveToPoint(int _x, int _y);
