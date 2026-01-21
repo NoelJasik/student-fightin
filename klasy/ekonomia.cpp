@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 using namespace std;
-int kasa = 1000;//dodanie kasy ~dawid trzeba będzie voida zrobić z update
+int kasa = 100;//dodanie kasy ~dawid trzeba będzie voida zrobić z update
 
 
 //void koszt(SDL_Renderer * renderer) {
