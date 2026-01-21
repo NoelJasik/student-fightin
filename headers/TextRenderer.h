@@ -10,7 +10,6 @@
 #include <cmath>
 #include <sstream>
 #include <iomanip>
-#include <algorithm>
 static std::string roundToString(float value, int decimals)
 {
     float factor = std::pow(10.0f, decimals);

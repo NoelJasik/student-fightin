@@ -4,15 +4,17 @@
 
 #ifndef UNIPROJECT_BUTTON_H
 #define UNIPROJECT_BUTTON_H
+#pragma once
 #include <SDL.h>
 
-
 class Button {
-    public:
-    bool IsSelected = false;
+public:
     Button();
 
-    void update(SDL_Renderer *renderer, const SDL_Event &e, int &current_tower); // to jest odpowiedzialne za pobranie danych do przycisku
+    bool handleEvent(const SDL_Event& e, int& current_tower);
+    void render(SDL_Renderer* renderer);
+    SDL_Rect rect{};
+    int towerId = 0;
 };
 
 
