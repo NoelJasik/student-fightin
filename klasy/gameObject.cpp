@@ -24,6 +24,7 @@ gameObject::gameObject() {
 
 gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage,
                        float _attackspeed) {
+    lvl=1;
     rect.x = _x;
     rect.y = _y;
     rect.w = _w;
@@ -51,6 +52,7 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
 
 gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage,
                        float _attackspeed, bool _isEnemy, float _maxSpeedX, float _maxSpeedY) {
+    lvl=1;
     rect.x = _x;
     rect.y = _y;
     rect.w = _w;

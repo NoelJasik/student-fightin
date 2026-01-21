@@ -14,6 +14,7 @@ private:
 public:
     SDL_Rect rect{0,0,0,0};
     std::string name;
+    int lvl;
     float hp;
     float maxYSpeed = 0;
     float maxXSpeed = 0;

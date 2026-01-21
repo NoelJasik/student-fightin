@@ -56,7 +56,7 @@ void spawnTower(int _x, int _y, int _type) {
             tower = gameObject(_x, _y, 50, 90, "Student", 100, 10, 1.0);
             break;
         case 2:
-            tower = gameObject(_x, _y, 100, 200, "Koparka", 200, 10, 1.0);
+            tower = gameObject(_x, _y, 100, 200, "Koparka", 100, 10, 1.0);
             tower.setMaxMoveSpeed(0, 10);
             break;
         case 3:
@@ -211,6 +211,14 @@ int main(int argc, char *argv[]) {
             // inputBox.handleEvent(e);
             // if (inputBox.isActive())
             //  continue;
+            bool uiConsumed = false;
+
+            if (selectedTower) {
+                uiConsumed = stats_box.handleEvent(e, *selectedTower, notification_manager);
+            }
+
+            if (uiConsumed)
+                continue;
             if (e.type == SDL_QUIT) {
                 running = false;
             }
