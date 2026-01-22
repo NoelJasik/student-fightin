@@ -7,7 +7,7 @@
 
 
 class ekonomia {
-    int kasa = 100;
+    int kasa = 70;
 public:
     void odejmowaniekasy(int naleznosc);
     void dodawaniekasy();
