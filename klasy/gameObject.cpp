@@ -129,6 +129,7 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
 
 
 
+
 void gameObject::moveBySpeed() {
     float deltaTime = static_cast<float>(SDL_GetTicks64() - lastUpdateTime) / 1000.0f;
 
@@ -265,6 +266,8 @@ void gameObject::update() {
             destroy = true;
         }
     } else if (rect.x < -10) {
+        // playerHealthRef -= attackDamage;
+        isAttackingAGH = true;
         destroy = true;
     }
 }

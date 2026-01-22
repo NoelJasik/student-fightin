@@ -17,6 +17,7 @@ using namespace std;
 // Można wyciągnąć z tego klase screensize
 using namespace gameSettings;
 int currentWave = 0;
+float playerHealth = 100.0f;
 vector<gameObject> towers;
 vector<gameObject> enemies;
 bool activeWave=false;
@@ -220,6 +221,9 @@ void gameObjectCleanup() {
         return t.destroy;
     });
     std::erase_if(enemies, [](const gameObject &e) {
+        if (e.isAttackingAGH) {
+            playerHealth -= e.attackDamage;
+        }
         return e.destroy;
     });
 
@@ -490,7 +494,7 @@ int main(int argc, char *argv[]) {
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background_texture, nullptr, nullptr);
         isStillWave();
-        topBar.render(renderer, current_tower, uiEkonomia.getMoney(), notficiationsTextRenderer, currentWave, isStillWave());
+        topBar.render(renderer, current_tower, uiEkonomia.getMoney(), notficiationsTextRenderer, currentWave, isStillWave(), playerHealth);
         // TODO - renderowanie wież i przeciwników z ich grafikami, zamiast tej samej do wszystkiego
         for (auto &t: towers) {
             SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);

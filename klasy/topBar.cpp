@@ -57,7 +57,8 @@ void topBar::render(SDL_Renderer* renderer,
                     int current_tower,
                     int money,
                     TextRenderer& text, int currentWave,
-                    bool activeWave)
+                    bool activeWave,
+                    float playerHealth)
 {
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
@@ -148,6 +149,17 @@ void topBar::render(SDL_Renderer* renderer,
             btnY + (btnH - tH) / 2
         );
     }
+
+    // ---------- HP GRACZA ----------
+
+    // TODO - przekminić miejsce żeby się nie wyświetlało pod powiadomieniami
+    std::string healthText = "Zdrowie: " + std::to_string(static_cast<int>(playerHealth));
+    int healthW = 0, healthH = 0;
+    text.measure(healthText, healthW, healthH);
+    int healthX = waveX + waveW + 500 ;
+    int healthY = rect.y + (rect.h - healthH) / 2;
+    text.render(healthText, healthX, healthY);
+
 }
 void topBar::resetStartWaveClicked() {
     startWaveClicked=false;
