@@ -16,13 +16,89 @@
 using namespace std;
 // Można wyciągnąć z tego klase screensize
 using namespace gameSettings;
-int currentWave=1;
+int currentWave = 1;
 vector<gameObject> towers;
 vector<gameObject> enemies;
 
+// ------ MENU -------
+int showmenu(SDL_Renderer* renderer, TextRenderer* textRenderer) {
+if(!renderer || !textRenderer) {
+    std::cerr << "Renderer or TextRenderer is null!" << std::endl;
+    return -1;
+}
+    const int NumMenu = 2;
+    const char* labels[NumMenu] = {"Continue", "Exit"};
+    bool selected[NumMenu]={false, false};
+    SDL_Color colors[2] = {{255,255,255},{255,0,0}};
+
+    int screenW, screenH;
+    SDL_GetRendererOutputSize(renderer, &screenW, &screenH);
+
+    int textW[NumMenu], textH[NumMenu];
+    for (int i =0;i<NumMenu;i++) {
+        textRenderer->measure(labels[i], textW[i], textH[i]);
+    }
+    SDL_Rect pos[NumMenu];
+    pos[0].x=screenW/2 - textW[0]/2;
+    pos[0].y=screenH/2 - textH[0];
+    pos[1].x=screenW/2 - textW[1]/2;
+    pos[1].y=screenH/2 + textH[1];
+
+    SDL_Event menuevent;
+    while(true)
+    {
+        while (SDL_PollEvent(&menuevent))
+            {
+                switch(menuevent.type) {
+                    case SDL_QUIT:
+                        return 1;
+                    case SDL_MOUSEMOTION: {
+                        int x = menuevent.motion.x;
+                        int y = menuevent.motion.y;
+                        for (int i=0;i<NumMenu;i++) {
+                            selected[i] = (x>=pos[i].x && x<=pos[i].x+textW[i] && y>=pos[i].y && y<=pos[i].y+textH[i]);
+
+                        }
+                        break;
+                    }
+                    case SDL_MOUSEBUTTONDOWN: {
+                        int x = menuevent.button.x;
+                        int y = menuevent.button.y;
+                        for (int i = 0; i < NumMenu; i++) {
+                            if (x >= pos[i].x && x <= pos[i].x + textW[i] &&
+                                y >= pos[i].y && y <= pos[i].y + textH[i]) {
+                                return i;
+                                }
+                        }
+                        break;
+                    }
+
+
+                    case SDL_KEYDOWN:
+                        if (menuevent.key.keysym.sym == SDLK_ESCAPE) {
+                            return 0;
+                        }
+                        break;
+                    }
+            }
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        for (int i = 0; i < NumMenu; i++) {
+            textRenderer->render(labels[i],pos[i].x, pos[i].y, colors[selected[i] ? 1 : 0]);
+        }
+        SDL_RenderPresent(renderer);
+        SDL_Delay(10);
+        }
+    return 0;
+}
+
+
 // ------ GRAFIKI ------
 SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
-// TODO - wrzucić to do klasy żeby się dało łatwo pobierać
+SDL_Surface *TTF_RenderText_Solid(TTF_Font *font, const char *str, int fg, SDL_Color sdl_color);
+SDL_Surface *tower_surface = IMG_Load("assets/aghUnit.png");
+SDL_Surface *enemy_surface = IMG_Load("assets/kibolUnit.png");
+
 uiStatsBox stats_box;
 gameObject *selectedTower = nullptr;
 
@@ -50,14 +126,14 @@ void spawnTower(int _x, int _y, int _type) {
         default:
             return;
         case 1:
-            tower = gameObject(_x, _y, 50, 90, "Student", 100, 10, 1.0);
+            tower = gameObject(_x, _y, 50, 90, "Student", 100, 10, 1.0, false, 0, 0, 0.05f, 60);
             break;
         case 2:
-            tower = gameObject(_x, _y, 100, 200, "Koparka", 100, 10, 1.0);
+            tower = gameObject(_x, _y, 100, 200, "Koparka", 10000, 10, 5, false, 0, 0, 0.05f, 8600);
             tower.setMaxMoveSpeed(0, 10);
             break;
         case 3:
-            tower = gameObject(_x, _y, 100, 100, "Studenciak (budynek)", 150, 10, 1.0);
+            tower = gameObject(_x, _y, 100, 100, "Duet", 150, 10, 1.0, false, 0, 0, 0.05f, 0);
             break;
     }
     // wycentrowanie
@@ -73,12 +149,39 @@ void spawnTower(int _x, int _y, int _type) {
 }
 
 // Logika odpalania fal i spawnowania przeciwników
-void startWave(int _enemyCount, int _enemySpread) {
+void startWave() {
+    const int _enemyCount = 10 + (currentWave - 1) * 2;
+    const int _enemySpread = 500 + (currentWave - 1) * 50;
     for (int i = 0; i < _enemyCount; i++) {
-        gameObject enemy = gameObject(ScreenSize::getWidth() + rand() % _enemySpread, rand() % ScreenSize::getHeight(),
-                                      50, 90, "Enemy", 50, 10, 1.0, true, -0.5f, 0);
+        float basePower = 1.0f + (currentWave - 1) * 0.1f;
+        float rnd = static_cast<float>(rand()) / static_cast<float>(RAND_MAX); // 0..1
+        float randomScale = 0.85f + rnd * 0.3f; // ~0.85 .. 1.15
+        float power = basePower * randomScale;
+        float sizeScale = 0.7f + rnd * 0.6f; // ~0.7 .. 1.3
+
+        int w = static_cast<int>(50 * sizeScale);
+        int h = static_cast<int>(90 * sizeScale);
+        if (w < 20) w = 20;
+        if (h < 30) h = 30;
+        if (w > 200) w = 200;
+        if (h > 300) h = 300;
+
+        int hp = static_cast<int>(50 * power);
+        int dmg = static_cast<int>(10 * power);
+        int attackForce = static_cast<int>(1.0f * power);
+
+        float baseSpeed = 2.0f;
+        float velX = - (baseSpeed / power);
+        if (velX < -6.0f) velX = -6.0f;
+        if (velX > -0.5f) velX = -0.5f;
+
+        gameObject enemy = gameObject(
+            ScreenSize::getWidth() + rand() % _enemySpread,
+            (rand() % (ScreenSize::getHeight() - 120)) + 120,
+            w, h, "Enemy", hp, dmg, attackForce, true, velX, 0, 0.02f, 70 * power);
         enemies.push_back(enemy);
     }
+    currentWave++;
 }
 
 // TODO zrobić żeby to sie wyświetlało co X ticków, żeby łatwiej się testowało garbage collector.
@@ -111,7 +214,6 @@ void gameObjectCleanup() {
     }
 }
 
-SDL_Surface *TTF_RenderText_Solid(TTF_Font *font, const char *str, int fg, SDL_Color sdl_color);
 
 int main(int argc, char *argv[]) {
     // Sprawdzanie errorów
@@ -131,6 +233,7 @@ int main(int argc, char *argv[]) {
     SDL_Event e;
     SDL_Init(SDL_INIT_EVERYTHING);
     bool running = true;
+    bool isPaused = false;
     SDL_Rect player{10, 10, 10, 20};
     // 0 - brak 1 - piechota 2 - killdozer 3 - działko
     int current_tower = 0;
@@ -165,8 +268,7 @@ int main(int argc, char *argv[]) {
     // Wykorzystajmy (narazie, jak będzie czas to zmienimy) kursor systemowy. Jako inżynier trzeba korzystać z praktycznych rozwiązań i rozwiązywać praktyczne problemy, kursor to problem już dawno rozwiązany
     // auto player_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 10, 20);    SDL_Surface* player_surface = IMG_Load("assets/aghUnit.png");
 
-    auto tower_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 2709, 6468);
-    SDL_Surface *tower_surface = IMG_Load("assets/aghUnit.png");
+    // auto tower_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 2, 6);
     if (!tower_surface) {
         cout << "IMG_Load error: " << IMG_GetError() << endl;
         SDL_DestroyRenderer(renderer);
@@ -174,7 +276,7 @@ int main(int argc, char *argv[]) {
         SDL_Quit();
         return 1;
     }
-    tower_texture = SDL_CreateTextureFromSurface(renderer, tower_surface);
+    auto tower_texture = SDL_CreateTextureFromSurface(renderer, tower_surface);
     SDL_FreeSurface(tower_surface);
     if (!tower_texture) {
         cout << "SDL_CreateTextureFromSurface error: " << SDL_GetError() << endl;
@@ -184,18 +286,33 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    if (!enemy_surface) {
+        cout << "IMG_Load error: " << IMG_GetError() << endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+    auto enemy_texture = SDL_CreateTextureFromSurface(renderer, enemy_surface);
+    SDL_FreeSurface(enemy_surface);
+    if (!enemy_texture) {
+        cout << "SDL_CreateTextureFromSurface error: " << SDL_GetError() << endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
 
-    SDL_SetRenderTarget(renderer, background_texture);
-    SDL_SetRenderDrawColor(renderer, 51, 102, 0, 255);
-    SDL_RenderClear(renderer);
+    // To jest useless bo napisujemy to w pętli gry, ale jakby render się jebał to można odkomentować
+    // SDL_SetRenderTarget(renderer, background_texture);
+    // SDL_RenderClear(renderer);
 
     // SDL_SetRenderTarget(renderer, player_texture);
     // SDL_SetRenderDrawColor(renderer, 204, 102, 0, 255);
     // SDL_RenderClear(renderer);
 
-    SDL_SetRenderTarget(renderer, tower_texture);
-    SDL_SetRenderDrawColor(renderer, 204, 102, 0, 255);
-    SDL_RenderClear(renderer);
+    // SDL_SetRenderTarget(renderer, tower_texture);
+    // SDL_RenderClear(renderer);
 
     SDL_SetRenderTarget(renderer, nullptr);
 
@@ -233,8 +350,20 @@ int main(int argc, char *argv[]) {
                         break;
                     case SDLK_9:
                         current_tower = 0;
+                        break;
                     case SDLK_q:
-                        startWave(1000, 100000);
+                        startWave();
+                        break;
+                    case SDLK_p:
+                        isPaused = true;
+                        int menuresult = showmenu(renderer, &notficiationsTextRenderer);
+                        std::cout << "Menu result: " << menuresult << std::endl;
+                        if (menuresult == 1) {
+                            std::cout << "Setting running = false" << std::endl;
+                            running = false;
+                        }
+                        isPaused = false;
+                        break;
                 }
 
 
@@ -247,14 +376,18 @@ int main(int argc, char *argv[]) {
                 // można stawiać tylko w lewej połowie ekranu
                 int towerHeight = 0;
                 switch (current_tower) {
-                    case 1: towerHeight = 90; break;
-                    case 2: towerHeight = 200; break;
-                    case 3: towerHeight = 100; break;
+                    case 1: towerHeight = 90;
+                        break;
+                    case 2: towerHeight = 200;
+                        break;
+                    case 3: towerHeight = 100;
+                        break;
                 }
                 if (e.button.button == SDL_BUTTON_LEFT &&
                     e.button.x <= ScreenSize::getWidth() / 2 &&
                     current_tower != 0 &&
-                    e.button.y - towerHeight / 2 >= topBar.rect.h) { //sprawdzenie czy nie nachodzi na topbar
+                    e.button.y - towerHeight / 2 >= topBar.rect.h) {
+                    //sprawdzenie czy nie nachodzi na topbar
                     double distance = 0; // zmienne do przechowywania dystansu i czy jednsotka moze byc postawiona
                     float can_be_placed = true;
                     if (current_tower == 1) {
@@ -338,13 +471,14 @@ int main(int argc, char *argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background_texture, nullptr, nullptr);
-        topBar.render(renderer,current_tower, uiEkonomia.getMoney(), notficiationsTextRenderer, currentWave);
+        topBar.render(renderer, current_tower, uiEkonomia.getMoney(), notficiationsTextRenderer, currentWave);
+        // TODO - renderowanie wież i przeciwników z ich grafikami, zamiast tej samej do wszystkiego
         for (auto &t: towers) {
             SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
             t.update();
         }
         for (auto &e: enemies) {
-            SDL_RenderCopy(renderer, tower_texture, nullptr, &e.rect);
+            SDL_RenderCopy(renderer, enemy_texture, nullptr, &e.rect);
             e.update();
         }
         notification_manager.render(window);

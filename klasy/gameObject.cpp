@@ -29,6 +29,10 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startPosX = _x;
+    startPosY = _y;
+    trueXPos = _x;
+    trueYPos = _y;
     name = _name;
     attackDamage = _attackdamage;
     attackForce = _attackspeed;
@@ -38,10 +42,15 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
 
 gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage,
                        float _attackspeed, bool _isEnemy) {
+    lvl=1;
     rect.x = _x;
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startPosX = _x;
+    startPosY = _y;
+    trueXPos = _x;
+    trueYPos = _y;
     name = _name;
     hp = _hp;
     attackDamage = _attackdamage;
@@ -57,6 +66,10 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startPosX = _x;
+    startPosY = _y;
+    trueXPos = _x;
+    trueYPos = _y;
     name = _name;
     hp = _hp;
     attackDamage = _attackdamage;
@@ -67,33 +80,104 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     update();
 }
 
+gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage,
+                       float _attackspeed, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass) {
+    lvl=1;
+    rect.x = _x;
+    rect.y = _y;
+    rect.w = _w;
+    rect.h = _h;
+    startPosX = _x;
+    startPosY = _y;
+    trueXPos = _x;
+    trueYPos = _y;
+    name = _name;
+    hp = _hp;
+    attackDamage = _attackdamage;
+    attackForce = _attackspeed;
+    isEnemy = _isEnemy;
+    accelerationSpeed = _accelerationSpeed;
+    mass = _mass;
+    setMaxMoveSpeed(_maxSpeedY, _maxSpeedX);
+    // setCurrentMoveSpeed(_maxSpeedY, _maxSpeedX);
+    update();
+}
+gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage,
+                       float _attackspeed, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass, SDL_Texture* _image) {
+    lvl=1;
+    rect.x = _x;
+    rect.y = _y;
+    rect.w = _w;
+    rect.h = _h;
+    startPosX = _x;
+    startPosY = _y;
+    trueXPos = _x;
+    trueYPos = _y;
+    name = _name;
+    hp = _hp;
+    attackDamage = _attackdamage;
+    attackForce = _attackspeed;
+    isEnemy = _isEnemy;
+    accelerationSpeed = _accelerationSpeed;
+    mass = _mass;
+    image = _image;
+    setMaxMoveSpeed(_maxSpeedY, _maxSpeedX);
+    // setCurrentMoveSpeed(_maxSpeedY, _maxSpeedX);
+    update();
+}
+
+
+
 
 void gameObject::moveBySpeed() {
     float deltaTime = static_cast<float>(SDL_GetTicks64() - lastUpdateTime) / 1000.0f;
 
-    // TODO Naprawić to przyśpieszenie
+    // if (deltaTime <= 0) {
+    //     return; // Unikaj dzielenia przez zero lub negatywnego deltaTime
+    // }
+    if (mass == 0) {
+        return;
+    }
+
     // Przyśpieszenie dla osi X
-    if (maxXSpeed >= 0) { // Poruszanie w prawo lub brak ruchu
+    if (maxXSpeed > 0) { // Poruszanie w prawo lub brak ruchu
        if (currentXSpeed < maxXSpeed) {
-           currentXSpeed += accelearationSpeed * deltaTime;
+           currentXSpeed += accelerationSpeed * mass * deltaTime;
        } else {
            currentXSpeed = maxXSpeed;
        }
-    } else { // Poruszanie w lewo (maxXSpeed jest ujemne)
+    }
+    else if (maxXSpeed < 0) { // Poruszanie w lewo (maxXSpeed jest ujemne)
         if (currentXSpeed > maxXSpeed) {
-            currentXSpeed -= accelearationSpeed * deltaTime;
+            currentXSpeed -= accelerationSpeed * mass * deltaTime;
         }
         else {
             currentXSpeed = maxXSpeed;
+        }
+    } else if (maxXSpeed == 0) {
+        if (trueXPos < startPosX) {
+            currentXSpeed += accelerationSpeed * mass * deltaTime;
+        } else if (currentXSpeed > 0.1f) {
+            currentXSpeed -= accelerationSpeed * mass * deltaTime;
+        } else if (currentXSpeed < -0.1f) {
+            currentXSpeed += accelerationSpeed * mass * deltaTime;
+        } else {
+            currentXSpeed = 0;
         }
     }
     // std::cout<< currentXSpeed << " " << name << std::endl;
 
     // Aktualizacja
     // std::cout << (currentXSpeed * deltaTime * 100) << std::endl; // debug
-    rect.x += static_cast<int>(currentXSpeed * 10); // skalujemy na pixele
-    rect.y += static_cast<int>(currentYSpeed * 10); // skalujemy na pixele
+    trueXPos += currentXSpeed;
+    trueYPos += currentYSpeed;
+    moveToPoint(trueXPos, trueYPos);
     lastUpdateTime = SDL_GetTicks64();
+}
+
+void gameObject::moveToPoint(int _x, int _y) {
+rect.x = _x - rect.w / 2;
+    rect.y = _y - rect.h / 2;
 }
 
 
@@ -143,10 +227,25 @@ std::vector<gameObject *> gameObject::checkCollisions(std::vector<gameObject> &o
 }
 
 void gameObject::combatWith(gameObject &enemy) {
-    enemy.setCurrentMoveSpeed(0, 0);
-    enemy.rect.x += 20;
+    enemy.setCurrentMoveSpeed(0,  attackForce);
+    setCurrentMoveSpeed(0, -enemy.attackForce);
     enemy.hp -= attackDamage;
     hp -= enemy.attackDamage;
+}
+
+void gameObject::levelUp() {
+    lvl += 1;
+    if (lvl <= 0) lvl = 1;
+    // malejące przyrosty: im wyższy poziom, tym mniejszy procentowy wzrost
+    float dmgMult = 1.0f + 0.2f / lvl;
+    float forceMult = 1.0f + 0.1f / lvl;
+    float hpMult = 1.0f + 0.3f / lvl;
+    float sizeMult = 1.0f + 0.3f / lvl;
+    attackDamage *= dmgMult;
+    attackForce *= forceMult;
+    hp *= hpMult;
+    rect.h = static_cast<int>(rect.h * sizeMult);
+    rect.w = static_cast<int>(rect.w * sizeMult);
 }
 
 

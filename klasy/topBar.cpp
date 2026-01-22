@@ -13,6 +13,7 @@ topBar::topBar(int screenWidth)
 
 
     b1.rect = {10, buttonY, buttonSize, buttonSize};
+
     b1.towerId = 1;
 
     b2.rect = {70, buttonY, buttonSize, buttonSize};
@@ -78,10 +79,23 @@ void topBar::render(SDL_Renderer* renderer,
         // zapamiętaj prawą krawędź
         lastButtonRight = std::max(lastButtonRight, b.rect.x + b.rect.w);
     }
+    //-----------KOSZTY----------
+    std::string koszt = "$10";
+    int textW = 0, textH = 0;
+    text.measure(koszt, textW, textH);
+    text.render(koszt, 10, (rect.h - textH) / 2);
 
+
+    std::string koszt2 = "$50";
+    text.measure(koszt2, textW, textH);
+    text.render(koszt2, 70, (rect.h - textH) / 2);
+
+    std::string koszt3 = "$25";
+    text.measure(koszt3, textW, textH);
+    text.render(koszt3, 130, (rect.h - textH) / 2);
     // ---------- KASA ----------
     std::string moneyText = "Saldo: $ " + std::to_string(money);
-    int textW = 0, textH = 0;
+
     text.measure(moneyText, textW, textH);
 
     int moneyX = lastButtonRight + 40;                 // ⬅️ 40 px od buttonów
