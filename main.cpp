@@ -98,8 +98,8 @@ if(!renderer || !textRenderer) {
 // ------ GRAFIKI ------
 SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
 SDL_Surface *TTF_RenderText_Solid(TTF_Font *font, const char *str, int fg, SDL_Color sdl_color);
-SDL_Surface *tower_surface = IMG_Load("assets/aghUnit.png");
-SDL_Surface *enemy_surface = IMG_Load("assets/kibolUnit.png");
+SDL_Surface *tower_surface = IMG_Load("assets/student.jpg");
+SDL_Surface *enemy_surface = IMG_Load("assets/kibolUnit.jpg");
 
 uiStatsBox stats_box;
 gameObject *selectedTower = nullptr;
