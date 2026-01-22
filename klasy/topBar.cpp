@@ -121,7 +121,7 @@ void topBar::render(SDL_Renderer* renderer,
         text.render(wave, waveX, waveY);
     }
 
-    if(currentWave<11 &&  !activeWave) {3
+    if(currentWave<11 &&  !activeWave) {
         // rozpocznij fale
         int btnW = 200;
         int btnH = 40;
