@@ -22,6 +22,7 @@ vector<gameObject> towers;
 vector<gameObject> enemies;
 bool activeWave=false;
 bool endWave=false;
+ekonomia uiEkonomia; // tutaj deklaracja ekonomi
 // ------ MENU -------
 int showmenu(SDL_Renderer* renderer, TextRenderer* textRenderer) {
 if(!renderer || !textRenderer) {
@@ -224,7 +225,9 @@ void gameObjectCleanup() {
         if (e.isAttackingAGH) {
             playerHealth -= e.attackDamage;
         }
+
         return e.destroy;
+
     });
 
     if (selectedTower && selectedTower->destroy) {
@@ -236,6 +239,7 @@ void gameObjectCleanup() {
 
 
 int main(int argc, char *argv[]) {
+
     // Sprawdzanie errorów
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         cout << "SDL_Init error: " << SDL_GetError() << endl;
@@ -338,7 +342,7 @@ int main(int argc, char *argv[]) {
 
 
     Button uiButton; // renderuje przycisk
-    ekonomia uiEkonomia;
+
     NotificationManager notification_manager(renderer, &notficiationsTextRenderer);
     while (running) {
         while (SDL_PollEvent(&e)) {
@@ -446,7 +450,8 @@ int main(int argc, char *argv[]) {
                         selectedTower = nullptr;
                         // inputBox.open(e.button.x, e.button.y, current_tower);
                         if (uiEkonomia.getMoney() >= kosztjednostki) {
-                            uiEkonomia.odejmowanie(kosztjednostki);//tutaj wjebać odejmowanie kasy
+                            bool dodawanie = false;
+                            uiEkonomia.liczenie(kosztjednostki, dodawanie);//tutaj wjebać odejmowanie kasy
 
                             spawnTower(
                                 e.button.x,
@@ -455,7 +460,7 @@ int main(int argc, char *argv[]) {
 
                         );
                         }else {
-                            notification_manager.add("jesteś za biedny");
+                            notification_manager.add("jestes za biedny");
                         }
                     } else {
                         selectedTower = nullptr;
