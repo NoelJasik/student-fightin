@@ -10,7 +10,7 @@
 class Button {
 public:
     Button();
-
+    bool isActionButton = false;
     bool handleEvent(const SDL_Event& e, int& current_tower);
     void render(SDL_Renderer* renderer);
     SDL_Rect rect{};

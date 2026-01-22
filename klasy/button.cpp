@@ -4,6 +4,8 @@
 #include <SDL.h>
 #include "../headers/button.h"
 
+#include "topBar.h"
+
 Button::Button() = default;
 
 
@@ -17,7 +19,9 @@ bool Button::handleEvent(const SDL_Event& e, int& current_tower)
         e.button.y >= rect.y &&
         e.button.y <= rect.y + rect.h)
     {
-        current_tower = towerId;
+        if (!isActionButton)
+            current_tower = towerId;
+
         return true;
     }
     return false;

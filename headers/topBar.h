@@ -15,8 +15,10 @@ public:
     std::vector<Button> buttons;
 
     topBar(int screenWidth);
-
+    Button startWaveButton;
+    bool startWaveClicked = false;
     bool handleEvent(const SDL_Event& e, int& current_tower);
-    void render(SDL_Renderer* renderer, int current_tower, int money,  TextRenderer& text, int currentWave);
+    void render(SDL_Renderer* renderer, int current_tower, int money,  TextRenderer& text, int currentWave, bool activeWave);
+    void resetStartWaveClicked();
 };
 #endif //UNIPROJECT_TOPBAR_H

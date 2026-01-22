@@ -16,10 +16,11 @@
 using namespace std;
 // Można wyciągnąć z tego klase screensize
 using namespace gameSettings;
-int currentWave = 1;
+int currentWave = 0;
 vector<gameObject> towers;
 vector<gameObject> enemies;
-
+bool activeWave=false;
+bool endWave=false;
 // ------ MENU -------
 int showmenu(SDL_Renderer* renderer, TextRenderer* textRenderer) {
 if(!renderer || !textRenderer) {
@@ -148,40 +149,53 @@ void spawnTower(int _x, int _y, int _type) {
     towers.push_back(tower);
 }
 
+bool isStillWave() {
+    if(activeWave && enemies.size()==0) {
+        return false;
+    }else if (activeWave==false){
+        return false;
+    }else {
+        return true;
+    }
+}
 // Logika odpalania fal i spawnowania przeciwników
 void startWave() {
-    const int _enemyCount = 10 + (currentWave - 1) * 2;
-    const int _enemySpread = 500 + (currentWave - 1) * 50;
-    for (int i = 0; i < _enemyCount; i++) {
-        float basePower = 1.0f + (currentWave - 1) * 0.1f;
-        float rnd = static_cast<float>(rand()) / static_cast<float>(RAND_MAX); // 0..1
-        float randomScale = 0.85f + rnd * 0.3f; // ~0.85 .. 1.15
-        float power = basePower * randomScale;
-        float sizeScale = 0.7f + rnd * 0.6f; // ~0.7 .. 1.3
+    activeWave=isStillWave();
+    if(currentWave+1<=10 && !activeWave) {
+        const int _enemyCount = 10 + (currentWave - 1) * 2;
+        const int _enemySpread = 500 + (currentWave - 1) * 50;
+        for (int i = 0; i < _enemyCount; i++) {
+            float basePower = 1.0f + (currentWave - 1) * 0.1f;
+            float rnd = static_cast<float>(rand()) / static_cast<float>(RAND_MAX); // 0..1
+            float randomScale = 0.85f + rnd * 0.3f; // ~0.85 .. 1.15
+            float power = basePower * randomScale;
+            float sizeScale = 0.7f + rnd * 0.6f; // ~0.7 .. 1.3
 
-        int w = static_cast<int>(50 * sizeScale);
-        int h = static_cast<int>(90 * sizeScale);
-        if (w < 20) w = 20;
-        if (h < 30) h = 30;
-        if (w > 200) w = 200;
-        if (h > 300) h = 300;
+            int w = static_cast<int>(50 * sizeScale);
+            int h = static_cast<int>(90 * sizeScale);
+            if (w < 20) w = 20;
+            if (h < 30) h = 30;
+            if (w > 200) w = 200;
+            if (h > 300) h = 300;
 
-        int hp = static_cast<int>(50 * power);
-        int dmg = static_cast<int>(10 * power);
-        int attackForce = static_cast<int>(1.0f * power);
+            int hp = static_cast<int>(50 * power);
+            int dmg = static_cast<int>(10 * power);
+            int attackForce = static_cast<int>(1.0f * power);
 
-        float baseSpeed = 2.0f;
-        float velX = - (baseSpeed / power);
-        if (velX < -6.0f) velX = -6.0f;
-        if (velX > -0.5f) velX = -0.5f;
+            float baseSpeed = 2.0f;
+            float velX = - (baseSpeed / power);
+            if (velX < -6.0f) velX = -6.0f;
+            if (velX > -0.5f) velX = -0.5f;
 
-        gameObject enemy = gameObject(
-            ScreenSize::getWidth() + rand() % _enemySpread,
-            (rand() % (ScreenSize::getHeight() - 120)) + 120,
-            w, h, "Enemy", hp, dmg, attackForce, true, velX, 0, 0.02f, 70 * power);
-        enemies.push_back(enemy);
+            gameObject enemy = gameObject(
+                ScreenSize::getWidth() + rand() % _enemySpread,
+                (rand() % (ScreenSize::getHeight() - 120)) + 120,
+                w, h, "Enemy", hp, dmg, attackForce, true, velX, 0, 0.02f, 70 * power);
+            enemies.push_back(enemy);
+            }
+        currentWave++;
+        activeWave=true;
     }
-    currentWave++;
 }
 
 // TODO zrobić żeby to sie wyświetlało co X ticków, żeby łatwiej się testowało garbage collector.
@@ -327,6 +341,10 @@ int main(int argc, char *argv[]) {
             //  continue;
             bool uiConsumed = false;
             uiConsumed = topBar.handleEvent(e, current_tower);
+            if (topBar.startWaveClicked) {
+                startWave();
+                topBar.resetStartWaveClicked();
+            }
             if (!uiConsumed && selectedTower) {
                 uiConsumed = stats_box.handleEvent(e, *selectedTower, notification_manager);
             }
@@ -471,7 +489,8 @@ int main(int argc, char *argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background_texture, nullptr, nullptr);
-        topBar.render(renderer, current_tower, uiEkonomia.getMoney(), notficiationsTextRenderer, currentWave);
+        isStillWave();
+        topBar.render(renderer, current_tower, uiEkonomia.getMoney(), notficiationsTextRenderer, currentWave, isStillWave());
         // TODO - renderowanie wież i przeciwników z ich grafikami, zamiast tej samej do wszystkiego
         for (auto &t: towers) {
             SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
