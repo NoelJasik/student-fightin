@@ -402,7 +402,7 @@ int main(int argc, char *argv[]) {
                 int towerHeight = 0;
                 switch (current_tower) {
                     case 1: towerHeight = 90;
-                        kosztjednostki = 20;
+                        kosztjednostki = 10;
                         break;
                     case 2: towerHeight = 200;
                         kosztjednostki = 50;
@@ -445,12 +445,18 @@ int main(int argc, char *argv[]) {
                     if (can_be_placed == true && current_tower != 0) {
                         selectedTower = nullptr;
                         // inputBox.open(e.button.x, e.button.y, current_tower);
-                        uiEkonomia.odejmowanie(uiEkonomia.getMoney(), kosztjednostki);//tutaj wjebać odejmowanie kasy
-                        spawnTower(
-                            e.button.x,
-                            e.button.y,
-                            current_tower
+                        if (uiEkonomia.getMoney() >= kosztjednostki) {
+                            uiEkonomia.odejmowanie(kosztjednostki);//tutaj wjebać odejmowanie kasy
+
+                            spawnTower(
+                                e.button.x,
+                                e.button.y,
+                                current_tower
+
                         );
+                        }else {
+                            notification_manager.add("jesteś za biedny");
+                        }
                     } else {
                         selectedTower = nullptr;
                         notification_manager.add("Nie mozna postawic jednsotki");
