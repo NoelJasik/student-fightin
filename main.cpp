@@ -235,6 +235,14 @@ void gameObjectCleanup() {
     }
 }
 
+void onPlayerDeath() {
+     playerHealth = 100.0f;
+        currentWave = 0;
+        towers.clear();
+        enemies.clear();
+        uiEkonomia.kasa = uiEkonomia.kasaStartowa;
+}
+
 
 
 
@@ -502,10 +510,15 @@ int main(int argc, char *argv[]) {
         //     );
         //     inputBox.reset();
         //     }
-        // ---------- Fizyka ----------
+        // ---------- Fizyka/Logika ----------
         // sprawdzanie kolizji
         // Przechodzimy przez każdy obiekt w wektorze (używamy referencji & żeby nie kopiować)
         checkCollisions();
+        // Umieranie
+        if (playerHealth <= 0) {
+            onPlayerDeath();
+            notification_manager.add("Zginales! Gra zostala zresetowana.");
+        }
 
         // -------------- render --------------
 
