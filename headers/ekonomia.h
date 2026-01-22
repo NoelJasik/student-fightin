@@ -7,8 +7,9 @@
 
 
 class ekonomia {
+    int kasa = 100;
 public:
-    void odejmowaniekasy(int kasa, int kosztjednostki);
+    void odejmowaniekasy(int kosztjednostki);
 
     ekonomia();
 
@@ -17,7 +18,7 @@ public:
     void update(SDL_Renderer * renderer);
     int getMoney();
 
-    void odejmowanie(int kasa,int kosztjednostki) {
+    void odejmowanie(int kosztjednostki) {
 
         kasa = kasa - kosztjednostki;
     };

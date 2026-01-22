@@ -7,17 +7,6 @@
 #include <iostream>
 #include <string>
 using namespace std;
-int kasa = 100;//dodanie kasy ~dawid trzeba będzie voida zrobić z update
-
-
-void ekonomia::odejmowaniekasy(int kasa, int kosztjednostki) {
-    kasa = kasa - kosztjednostki;
-    cout << kasa;
-
-
-
-}
-
 ekonomia::ekonomia() = default;
     void ekonomia::update(SDL_Renderer *renderer){
 
@@ -29,3 +18,9 @@ ekonomia::ekonomia() = default;
     }
 
 
+
+void ekonomia::odejmowaniekasy(int kosztjednostki) {
+        kasa = kasa - kosztjednostki;
+        cout << kasa;
+
+    }
