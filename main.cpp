@@ -352,6 +352,7 @@ int main(int argc, char *argv[]) {
             bool uiConsumed = false;
             uiConsumed = topBar.handleEvent(e, current_tower);
             if (topBar.startWaveClicked) {
+                uiEkonomia.liczenie(30,true);
                 startWave();
                 topBar.resetStartWaveClicked();
             }
