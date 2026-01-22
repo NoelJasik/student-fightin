@@ -6,7 +6,7 @@
 
 topBar::topBar(int screenWidth)
 {
-    rect = {0, 0, screenWidth, 70};
+    rect = {0, 0, screenWidth, 100};
     int buttonSize = 50;
     int buttonY = (rect.h - buttonSize) / 2;
     Button b1, b2, b3;
@@ -63,7 +63,7 @@ void topBar::render(SDL_Renderer* renderer,
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     // TŁO TOPBARA
-    SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 100);
     SDL_RenderFillRect(renderer, &rect);
 
     int lastButtonRight = 0;

@@ -6,8 +6,6 @@ Pomysł gry, to taki rts/tower defence gdzie przeciągamy na plansze studentów 
 ## mechaniki do zaimplementowania
  (osobne kategorie, kolejność priortetów od góry do dołu)
 ### Gameplay
-- Hp dla budynku AGH
-- Logika Fal (kończenie, przegrywanie)
 - Studenci chodzą jak npc, zamiast stać jak słup
 - jednostki nie przenikają przez siebie nawzajem, tylko się odbijają
 - Animacja rozwalania jednostek (wybuchy, kawałki lecące w powietrze)

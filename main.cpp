@@ -323,16 +323,16 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // To jest useless bo napisujemy to w pętli gry, ale jakby render się jebał to można odkomentować
-    // SDL_SetRenderTarget(renderer, background_texture);
-    // SDL_RenderClear(renderer);
+    // Resetowanie w pamięci (jednak przydatne xdd)
+    SDL_SetRenderTarget(renderer, background_texture);
+    SDL_RenderClear(renderer);
 
     // SDL_SetRenderTarget(renderer, player_texture);
     // SDL_SetRenderDrawColor(renderer, 204, 102, 0, 255);
     // SDL_RenderClear(renderer);
 
-    // SDL_SetRenderTarget(renderer, tower_texture);
-    // SDL_RenderClear(renderer);
+    SDL_SetRenderTarget(renderer, tower_texture);
+    SDL_RenderClear(renderer);
 
     SDL_SetRenderTarget(renderer, nullptr);
 
