@@ -9,19 +9,21 @@
 class ekonomia {
     int kasa = 100;
 public:
-    void odejmowaniekasy(int kosztjednostki);
-
+    void odejmowaniekasy(int naleznosc);
+    void dodawaniekasy();
     ekonomia();
 
 
 
     void update(SDL_Renderer * renderer);
     int getMoney();
-
-    void odejmowanie(int kosztjednostki) {
-
-        kasa = kasa - kosztjednostki;
+    void liczenie(int naleznosc, bool dodawanie) {
+        if (dodawanie) kasa = kasa + naleznosc;
+            else {
+                kasa = kasa - naleznosc;
+             }
     };
+
 };
 
 

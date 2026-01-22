@@ -6,7 +6,7 @@
 #include <SDL.h>
 #include <string>
 #include <vector>
-
+class ekonomia;
 class gameObject {
 // robie wszystko publiczne bo mam wywalone w optymalizacje, a do debugowania/pracy jest łatwiej
 private:

@@ -19,8 +19,3 @@ ekonomia::ekonomia() = default;
 
 
 
-void ekonomia::odejmowaniekasy(int kosztjednostki) {
-        kasa = kasa - kosztjednostki;
-        cout << kasa;
-
-    }

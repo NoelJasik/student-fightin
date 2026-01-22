@@ -9,9 +9,9 @@
 #include <SDL.h>
 #include <iostream>
 #include "../headers/gameSettings.h"
-
+#include "../headers/ekonomia.h"
 using namespace gameSettings;
-
+extern ekonomia uiEkonomia;
 gameObject::gameObject() {
     rect.x = 0;
     rect.y = 0;
@@ -252,9 +252,16 @@ void gameObject::levelUp() {
 
 // wywoływane co klatkę
 void gameObject::update() {
+
+
+
+
     moveBySpeed();
     if (hp <= 0) {
         destroy = true;
+
+        uiEkonomia.liczenie(5, true);
+
     }
 
     // prosta logika usuwania poza ekranem
