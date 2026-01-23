@@ -464,7 +464,22 @@ int main(int argc, char *argv[]) {
             // if (inputBox.isActive())
             //  continue;
             bool uiConsumed = false;
+            int prev_tower = current_tower;
             uiConsumed = topBar.handleEvent(e, current_tower);
+
+            if (uiConsumed &&
+               e.type == SDL_MOUSEBUTTONDOWN &&
+               e.button.button == SDL_BUTTON_LEFT &&
+               current_tower != prev_tower)
+            {
+                switch (current_tower) {
+                    case 1: notification_manager.add("Wybrałes stodenta"); break;
+                    case 2: notification_manager.add("Wybrałes koparke"); break;
+                    case 3: notification_manager.add("Wybrałes sklep monopolowy"); break;
+                    default: break;
+                }
+            }
+
             if (topBar.startWaveClicked) {
                 uiEkonomia.liczenie(50 + (currentWave * 100),true);
                 startWave();
@@ -484,12 +499,16 @@ int main(int argc, char *argv[]) {
                 switch (e.key.keysym.sym) {
                     case SDLK_1:
                         current_tower = 1;
+
+
                         break;
                     case SDLK_2:
                         current_tower = 2;
+
                         break;
                     case SDLK_3:
                         current_tower = 3;
+
                         break;
                     case SDLK_9:
                         current_tower = 0;
@@ -521,12 +540,15 @@ int main(int argc, char *argv[]) {
                 int towerHeight = 0;
                 switch (current_tower) {
                     case 1: towerHeight = 100;
+
                         kosztjednostki = 10 + (currentWave==1?0:(currentWave - 2))* 5;
                         break;
                     case 2: towerHeight = 100;
+
                         kosztjednostki = 50 + (currentWave==1?0:(currentWave - 2)) * 5;
                         break;
                     case 3: towerHeight = 100;
+
                         kosztjednostki = 75 + (currentWave==1?0:(currentWave - 2)) * 5;
                         break;
                 }
@@ -667,10 +689,13 @@ int main(int argc, char *argv[]) {
         uiEkonomia.update(renderer);
         inputBox.render(renderer);
         if (selectedTower) {
+
+
             stats_box.render(
                 renderer,
                 notficiationsTextRenderer,
                 *selectedTower
+
             );
         }
         if (gameWon) {
