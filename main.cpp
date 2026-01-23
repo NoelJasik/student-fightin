@@ -16,10 +16,13 @@
 using namespace std;
 // Można wyciągnąć z tego klase screensize
 using namespace gameSettings;
-int currentWave = 9;
+int currentWave = 1;
+int maxWave = 8;
 float playerHealth = 100.0f;
 vector<gameObject> towers;
 vector<gameObject> enemies;
+
+float lastTickTime = 0.0f;
 
 bool activeWave=false;
 bool endWave=false;
@@ -140,17 +143,26 @@ void spawnTower(int _x, int _y, int _type) {
             tower = gameObject(_x, _y, 40, 82, "Student", 100, 10, 1.0, false, 0, 0, 0.05f, 60, 1);
             break;
         case 2:
-            tower = gameObject(_x, _y, 70, 75, "Koparka", 10000, 10, 5, false, 0, 0, 0.0005f, 8600, 2);
+            tower = gameObject(_x, _y, 140, 150, "Koparka", 10000, 50, 5, false, 0, 0, 0.0005f, 8600, 2);
             tower.setMaxMoveSpeed(0, 10);
             tower.setCurrentMoveSpeed(0, 0);
+            tower.lvl = 420;
             break;
         case 3:
             tower = gameObject(_x, _y, 105, 65, "Duet", 150, 1, 1.0, false, 0, 0, 0.05f, 0, 3);
             break;
     }
+    for (int i = 0; i < (currentWave==1?0:(currentWave - 2)); i++) {
+        tower.levelUp();
+    }
     // wycentrowanie
     tower.rect.x = _x - tower.rect.w / 2;
     tower.rect.y = _y - tower.rect.h / 2;
+    // można było by to lepiej zooptymalizować xd
+    // tower.lvl = currentWave==1?1:(currentWave - 1);
+    // for (int i = 1; i < tower.lvl; i++) {
+    //     tower.levelUp();
+    // }
     // clamp żeby w ekranie się zmieściło
     if (tower.rect.x < 0) tower.rect.x = 0;
     if (tower.rect.y < 0) tower.rect.y = 0;
@@ -173,9 +185,11 @@ bool isStillWave() {
 void startWave() {
     if (gameWon) return;
     activeWave=isStillWave();
-    if(currentWave+1<=10 && !activeWave) {
+    if(currentWave<=maxWave && !activeWave) {
         const int _enemyCount = 10 + (currentWave - 1) * 2;
         const int _enemySpread = 500 + (currentWave - 1) * 50;
+        // const int _enemyCount = 1;
+        // const int _enemySpread = 200;
         for (int i = 0; i < _enemyCount; i++) {
             float basePower = 1.0f + (currentWave - 1) * 0.1f;
             float rnd = static_cast<float>(rand()) / static_cast<float>(RAND_MAX); // 0..1
@@ -205,8 +219,8 @@ void startWave() {
                 w, h, "Enemy", hp, dmg, attackForce, true, velX, 0, 0.02f, 70 * power);
             enemies.push_back(enemy);
             }
-        currentWave++;
         activeWave=true;
+        currentWave++;
     }
 }
 
@@ -229,6 +243,7 @@ void gameObjectCleanup() {
     if (activeWave && enemies.empty()) {
         activeWave = false;
     }
+
     // TODO Dodać do klasy gameobject funkcję onDestroy która się tu odpala, tam wjebiemy logike na dodawanie siana itd
     std::erase_if(towers, [](const gameObject &t) {
         // displayDebug();
@@ -246,7 +261,7 @@ void gameObjectCleanup() {
     if (selectedTower && selectedTower->destroy) {
         selectedTower = nullptr;
     }
-    if (currentWave >= 10 && enemies.empty() && !activeWave && !gameLost) {
+    if (currentWave > maxWave && enemies.empty() && !activeWave && !gameLost) {
         gameWon = true;
         showReplayButton = true;
 
@@ -278,6 +293,7 @@ void onPlayerDeath() {
 int main(int argc, char *argv[]) {
 
     // Sprawdzanie errorów
+
 
 
 
@@ -404,6 +420,9 @@ int main(int argc, char *argv[]) {
     Button uiButton; // renderuje przycisk
 
     NotificationManager notification_manager(renderer, &notficiationsTextRenderer);
+
+    // czasem się nie resetuje to daje na sztywno
+    // currentWave = 1;
     while (running) {
         while (SDL_PollEvent(&e)) {
             if (gameLost) {
@@ -413,7 +432,7 @@ int main(int argc, char *argv[]) {
                     gameLost = false;
                     gameWon = false;
                     activeWave = false;
-                    currentWave = 0;
+                    currentWave = 1;
                     playerHealth = 100.0f;
 
                     towers.clear();
@@ -430,7 +449,7 @@ int main(int argc, char *argv[]) {
                     gameWon = false;
                     showReplayButton = false;
                     activeWave = false;
-                    currentWave = 0;
+                    currentWave = 1;
                     playerHealth = 100.0f;
 
                     towers.clear();
@@ -447,7 +466,7 @@ int main(int argc, char *argv[]) {
             bool uiConsumed = false;
             uiConsumed = topBar.handleEvent(e, current_tower);
             if (topBar.startWaveClicked) {
-                uiEkonomia.liczenie(30,true);
+                uiEkonomia.liczenie(50 + (currentWave * 100),true);
                 startWave();
                 topBar.resetStartWaveClicked();
             }
@@ -475,9 +494,9 @@ int main(int argc, char *argv[]) {
                     case SDLK_9:
                         current_tower = 0;
                         break;
-                    case SDLK_q:
-                        startWave();
-                        break;
+                    // case SDLK_q:
+                    //     startWave();
+                    //     break;
                     case SDLK_p:
                         isPaused = true;
                         int menuresult = showmenu(renderer, &notficiationsTextRenderer);
@@ -501,14 +520,14 @@ int main(int argc, char *argv[]) {
                 // można stawiać tylko w lewej połowie ekranu
                 int towerHeight = 0;
                 switch (current_tower) {
-                    case 1: towerHeight = 90;
-                        kosztjednostki = 10;
+                    case 1: towerHeight = 100;
+                        kosztjednostki = 10 + (currentWave==1?0:(currentWave - 2))* 5;
                         break;
-                    case 2: towerHeight = 200;
-                        kosztjednostki = 50;
+                    case 2: towerHeight = 100;
+                        kosztjednostki = 50 + (currentWave==1?0:(currentWave - 2)) * 5;
                         break;
                     case 3: towerHeight = 100;
-                        kosztjednostki = 25;
+                        kosztjednostki = 75 + (currentWave==1?0:(currentWave - 2)) * 5;
                         break;
                 }
                 if (e.button.button == SDL_BUTTON_LEFT &&
@@ -523,7 +542,7 @@ int main(int argc, char *argv[]) {
                             distance = gameObject::calculateDistance(
                                 towers[i], gameObject(e.button.x, e.button.y, 20, 30, "Infantry Tower", 100, 10, 1.0));
                             // cout << "Distance: " << distance << " [i]" << i << endl;
-                            if (distance < 75) {
+                            if (distance < 50) {
                                 can_be_placed = false;
                                 // to jest zjebane, bo psuje gameplay zatrzymując całą grę
                                 // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
@@ -534,7 +553,7 @@ int main(int argc, char *argv[]) {
                         for (int i = 0; i < towers.size(); i++) {
                             distance = gameObject::calculateDistance(
                                 towers[i], gameObject(e.button.x, e.button.y, 20, 30, "Infantry Tower", 100, 10, 1.0));
-                            if (distance < 95) {
+                            if (distance < 75) {
                                 can_be_placed = false;
                                 // to jest zjebane, bo psuje gameplay zatrzymując całą grę
                                 // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
@@ -560,7 +579,7 @@ int main(int argc, char *argv[]) {
                         }
                     } else {
                         selectedTower = nullptr;
-                        notification_manager.add("Nie mozna postawic jednsotki");
+                        notification_manager.add("Za bilisko! Nie mozna postawic jednostki.");
                     }
                 }
                 if (e.button.button == SDL_BUTTON_RIGHT) {
@@ -614,13 +633,18 @@ int main(int argc, char *argv[]) {
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background_texture, nullptr, nullptr);
         isStillWave();
-        topBar.render(renderer, current_tower, uiEkonomia.getMoney(), notficiationsTextRenderer, currentWave, isStillWave(), playerHealth);
+        topBar.render(renderer, current_tower, uiEkonomia.getMoney(), notficiationsTextRenderer, currentWave, isStillWave(), playerHealth, maxWave);
         // TODO - renderowanie wież i przeciwników z ich grafikami, zamiast tej samej do wszystkiego
+        float deltaTime = (SDL_GetTicks() - lastTickTime) / 1000.0f;
         for (auto &t: towers) {
             if (t.imageID == 1) {
                 SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
             } else if (t.imageID == 3) {
                 SDL_RenderCopy(renderer, tower3_texture, nullptr, &t.rect);
+                if (isStillWave()) {
+                    uiEkonomia.kasa += t.lvl * 0.5 * deltaTime; // 50 groszy na sekunde * level, im wyzszy level tym wiecej kasy
+                }
+
             } else if (t.imageID == 2) {
                 // Renderowanie koparki na końcu. chyba to będzie bardziej wydajniejsze bo one będą rzadziej wykorzystywane
                 SDL_RenderCopy(renderer, tower2_texture, nullptr, &t.rect);
@@ -700,6 +724,7 @@ int main(int argc, char *argv[]) {
         }
 
             SDL_RenderPresent(renderer);
+            lastTickTime = SDL_GetTicks();
             SDL_Delay(10);
             continue;
     }
