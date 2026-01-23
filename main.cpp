@@ -39,7 +39,7 @@ if(!renderer || !textRenderer) {
     return -1;
 }
     const int NumMenu = 2;
-    const char* labels[NumMenu] = {"Continue", "Exit"};
+    const char* labels[NumMenu] = {"Kontynuuj", "Wyjscie"};
     bool selected[NumMenu]={false, false};
     SDL_Color colors[2] = {{255,255,255},{255,0,0}};
 
