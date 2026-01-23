@@ -137,14 +137,15 @@ void spawnTower(int _x, int _y, int _type) {
         default:
             return;
         case 1:
-            tower = gameObject(_x, _y, 50, 90, "Student", 100, 10, 1.0, false, 0, 0, 0.05f, 60, 1);
+            tower = gameObject(_x, _y, 40, 82, "Student", 100, 10, 1.0, false, 0, 0, 0.05f, 60, 1);
             break;
         case 2:
-            tower = gameObject(_x, _y, 100, 200, "Koparka", 10000, 10, 5, false, 0, 0, 0.05f, 8600, 2);
+            tower = gameObject(_x, _y, 70, 75, "Koparka", 10000, 10, 5, false, 0, 0, 0.0005f, 8600, 2);
             tower.setMaxMoveSpeed(0, 10);
+            tower.setCurrentMoveSpeed(0, 0);
             break;
         case 3:
-            tower = gameObject(_x, _y, 100, 100, "Duet", 150, 10, 1.0, false, 0, 0, 0.05f, 0, 3);
+            tower = gameObject(_x, _y, 105, 65, "Duet", 150, 1, 1.0, false, 0, 0, 0.05f, 0, 3);
             break;
     }
     // wycentrowanie
@@ -182,12 +183,12 @@ void startWave() {
             float power = basePower * randomScale;
             float sizeScale = 0.7f + rnd * 0.6f; // ~0.7 .. 1.3
 
-            int w = static_cast<int>(50 * sizeScale);
-            int h = static_cast<int>(90 * sizeScale);
+            int w = static_cast<int>(58 * sizeScale);
+            int h = static_cast<int>(68 * sizeScale);
             if (w < 20) w = 20;
             if (h < 30) h = 30;
-            if (w > 200) w = 200;
-            if (h > 300) h = 300;
+            if (w > 120) w = 120;
+            if (h > 170) h = 170;
 
             int hp = static_cast<int>(50 * power);
             int dmg = static_cast<int>(10 * power);
