@@ -9,8 +9,8 @@
 class ekonomia {
 
 public:
-    const int kasaStartowa = 70;
-    int kasa = 70;
+    const int kasaStartowa = 500;
+    int kasa = 500;
     void odejmowaniekasy(int naleznosc);
     void dodawaniekasy();
     ekonomia();

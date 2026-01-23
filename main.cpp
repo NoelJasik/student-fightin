@@ -16,13 +16,18 @@
 using namespace std;
 // Można wyciągnąć z tego klase screensize
 using namespace gameSettings;
-int currentWave = 0;
+int currentWave = 9;
 float playerHealth = 100.0f;
 vector<gameObject> towers;
 vector<gameObject> enemies;
 bool activeWave=false;
 bool endWave=false;
+bool gameWon = false;
+bool showReplayButton = false;
+Button replayButton;
 ekonomia uiEkonomia; // tutaj deklaracja ekonomi
+bool gameLost = false;
+Button defeatReplayButton;
 // ------ MENU -------
 int showmenu(SDL_Renderer* renderer, TextRenderer* textRenderer) {
 if(!renderer || !textRenderer) {
@@ -162,6 +167,7 @@ bool isStillWave() {
 }
 // Logika odpalania fal i spawnowania przeciwników
 void startWave() {
+    if (gameWon) return;
     activeWave=isStillWave();
     if(currentWave+1<=10 && !activeWave) {
         const int _enemyCount = 10 + (currentWave - 1) * 2;
@@ -216,6 +222,9 @@ void startWave() {
 
 // Czyścimy przeciwników i naszych z pamięci
 void gameObjectCleanup() {
+    if (activeWave && enemies.empty()) {
+        activeWave = false;
+    }
     // TODO Dodać do klasy gameobject funkcję onDestroy która się tu odpala, tam wjebiemy logike na dodawanie siana itd
     std::erase_if(towers, [](const gameObject &t) {
         // displayDebug();
@@ -233,14 +242,30 @@ void gameObjectCleanup() {
     if (selectedTower && selectedTower->destroy) {
         selectedTower = nullptr;
     }
+    if (currentWave >= 10 && enemies.empty() && !activeWave && !gameLost) {
+        gameWon = true;
+        showReplayButton = true;
+
+        replayButton.rect.w = 240;
+        replayButton.rect.h = 60;
+        replayButton.rect.x = ScreenSize::getWidth() / 2 - replayButton.rect.w / 2;
+        replayButton.rect.y = ScreenSize::getHeight() / 2 + 60;
+
+        replayButton.isActionButton = true;
+    }
 }
 
 void onPlayerDeath() {
-     playerHealth = 100.0f;
-        currentWave = 0;
-        towers.clear();
-        enemies.clear();
-        uiEkonomia.kasa = uiEkonomia.kasaStartowa;
+    enemies.clear();
+    towers.clear();
+    gameLost = true;
+
+    defeatReplayButton.rect.w = 240;
+    defeatReplayButton.rect.h = 60;
+    defeatReplayButton.rect.x = ScreenSize::getWidth() / 2 - defeatReplayButton.rect.w / 2;
+    defeatReplayButton.rect.y = ScreenSize::getHeight() / 2 + 60;
+
+    defeatReplayButton.isActionButton = true;
 }
 
 
@@ -249,6 +274,9 @@ void onPlayerDeath() {
 int main(int argc, char *argv[]) {
 
     // Sprawdzanie errorów
+
+
+
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         cout << "SDL_Init error: " << SDL_GetError() << endl;
         return 1;
@@ -273,6 +301,7 @@ int main(int argc, char *argv[]) {
 
     SDL_CreateWindowAndRenderer(ScreenSize::getWidth(), ScreenSize::getHeight(), 0, &window, &renderer);
     TextRenderer notficiationsTextRenderer(renderer, "assets/GravitasOne-Regular.ttf", 16);
+    TextRenderer bigTextRenderer(renderer, "assets/GravitasOne-Regular.ttf", 72);
     InputBox inputBox(&notficiationsTextRenderer);
     // Dałem statyczne, bo to jest tło
     auto background_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC,
@@ -354,6 +383,41 @@ int main(int argc, char *argv[]) {
     NotificationManager notification_manager(renderer, &notficiationsTextRenderer);
     while (running) {
         while (SDL_PollEvent(&e)) {
+            if (gameLost) {
+                int dummy = 0;
+                if (defeatReplayButton.handleEvent(e, dummy)) {
+                    // RESET GRY
+                    gameLost = false;
+                    gameWon = false;
+                    activeWave = false;
+                    currentWave = 0;
+                    playerHealth = 100.0f;
+
+                    towers.clear();
+                    enemies.clear();
+                    uiEkonomia.kasa = uiEkonomia.kasaStartowa;
+
+                    notification_manager.add("Nowa gra rozpoczęta!");
+                    continue;
+                }
+            }
+            if (gameWon && showReplayButton) {
+                int dummy = 0;
+                if (replayButton.handleEvent(e, dummy)) {
+                    gameWon = false;
+                    showReplayButton = false;
+                    activeWave = false;
+                    currentWave = 0;
+                    playerHealth = 100.0f;
+
+                    towers.clear();
+                    enemies.clear();
+                    uiEkonomia.kasa = uiEkonomia.kasaStartowa;
+
+                    notification_manager.add("Nowa gra rozpoczęta!");
+                    continue;
+                }
+            }
             // inputBox.handleEvent(e);
             // if (inputBox.isActive())
             //  continue;
@@ -365,7 +429,7 @@ int main(int argc, char *argv[]) {
                 topBar.resetStartWaveClicked();
             }
             if (!uiConsumed && selectedTower) {
-                uiConsumed = stats_box.handleEvent(e, *selectedTower, notification_manager);
+                uiConsumed = stats_box.handleEvent(e, *selectedTower, notification_manager, uiEkonomia);
             }
 
             if (uiConsumed)
@@ -513,11 +577,12 @@ int main(int argc, char *argv[]) {
         // ---------- Fizyka/Logika ----------
         // sprawdzanie kolizji
         // Przechodzimy przez każdy obiekt w wektorze (używamy referencji & żeby nie kopiować)
-        checkCollisions();
+        if (!gameWon && !gameLost) {
+            checkCollisions();
+        }
         // Umieranie
-        if (playerHealth <= 0) {
+        if (playerHealth <= 0 && !gameLost) {
             onPlayerDeath();
-            notification_manager.add("Zginales! Gra zostala zresetowana.");
         }
 
         // -------------- render --------------
@@ -553,8 +618,59 @@ int main(int argc, char *argv[]) {
                 *selectedTower
             );
         }
-        SDL_RenderPresent(renderer);
-        SDL_Delay(10);
+        if (gameWon) {
+            const char* winText = "WYGRANA!";
+            int textW, textH;
+            bigTextRenderer.measure(winText, textW, textH);
+
+            int x = ScreenSize::getWidth() / 2 - textW / 2;
+            int y = ScreenSize::getHeight() / 2 - textH;
+
+            SDL_Color gold = {255, 215, 0, 255};
+            bigTextRenderer.render(winText, x, y, gold);
+
+            if (showReplayButton) {
+                replayButton.render(renderer);
+
+                notficiationsTextRenderer.render(
+                    "ZAGRAJ PONOWNIE",
+                    replayButton.rect.x + 20,
+                    replayButton.rect.y + 18,
+                    {255, 255, 255, 255}
+                );
+            }
+        }
+        if (gameLost) {
+            // SZARY OVERLAY
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawColor(renderer, 60, 60, 60, 220);
+            SDL_Rect overlay = {0, 0, ScreenSize::getWidth(), ScreenSize::getHeight()};
+            SDL_RenderFillRect(renderer, &overlay);
+
+            // NAPIS PORAŻKA
+            const char* loseText = "PRZEGRANA";
+            int textW, textH;
+            bigTextRenderer.measure(loseText, textW, textH);
+
+            int x = ScreenSize::getWidth() / 2 - textW / 2;
+            int y = ScreenSize::getHeight() / 2 - textH;
+
+            SDL_Color red = {200, 30, 30, 255};
+            bigTextRenderer.render(loseText, x, y, red);
+
+            // PRZYCISK
+            defeatReplayButton.render(renderer);
+            notficiationsTextRenderer.render(
+                "ZAGRAJ PONOWNIE",
+                defeatReplayButton.rect.x + 20,
+                defeatReplayButton.rect.y + 18,
+                {255, 255, 255, 255}
+            );
+        }
+
+            SDL_RenderPresent(renderer);
+            SDL_Delay(10);
+            continue;
     }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
