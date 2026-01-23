@@ -11,6 +11,9 @@ class gameObject {
 // robie wszystko publiczne bo mam wywalone w optymalizacje, a do debugowania/pracy jest łatwiej
 private:
     float lastUpdateTime;
+    float startingWidth;
+    float startingHeight;
+
     // float &playerHealthRef;
 public:
     SDL_Rect rect{0,0,0,0};
@@ -45,6 +48,7 @@ public:
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass, SDL_Texture* _image);
     // gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass, SDL_Texture* _image, float &_playerHealth);
     void moveBySpeed();
+    void breathingAnimation();
 
 void moveToPoint(int _x, int _y);
 

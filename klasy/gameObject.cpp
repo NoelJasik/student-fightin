@@ -29,6 +29,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startingHeight = _h;
+    startingWidth = _w;
     startPosX = _x;
     startPosY = _y;
     trueXPos = _x;
@@ -47,6 +49,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startingHeight = _h;
+    startingWidth = _w;
     startPosX = _x;
     startPosY = _y;
     trueXPos = _x;
@@ -66,6 +70,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startingHeight = _h;
+    startingWidth = _w;
     startPosX = _x;
     startPosY = _y;
     trueXPos = _x;
@@ -87,6 +93,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startingHeight = _h;
+    startingWidth = _w;
     startPosX = _x;
     startPosY = _y;
     trueXPos = _x;
@@ -109,6 +117,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     rect.y = _y;
     rect.w = _w;
     rect.h = _h;
+    startingHeight = _h;
+    startingWidth = _w;
     startPosX = _x;
     startPosY = _y;
     trueXPos = _x;
@@ -245,8 +255,23 @@ void gameObject::levelUp() {
     attackDamage *= dmgMult;
     attackForce *= forceMult;
     hp *= hpMult;
-    rect.h = static_cast<int>(rect.h * sizeMult);
-    rect.w = static_cast<int>(rect.w * sizeMult);
+    startingHeight = static_cast<int>(startingHeight * sizeMult);
+    startingWidth = static_cast<int>(startingWidth * sizeMult);
+}
+
+void gameObject::breathingAnimation() {
+    float time = static_cast<float>(SDL_GetTicks64()) / 1000.0f; // czas w sekundach
+    float scale = 0.05f; // zakres skalowania
+    float frequency = 2.0f; // częstotliwość animacji
+
+    float scaleFactor = 1.0f + scale * sinf(frequency * time);
+
+    rect.w = static_cast<int>(startingWidth * scaleFactor);
+    rect.h = static_cast<int>(startingHeight * scaleFactor);
+
+    // centrowanie po zmianie rozmiaru
+    rect.x = static_cast<int>(trueXPos - rect.w / 2);
+    rect.y = static_cast<int>(trueYPos - rect.h / 2);
 }
 
 
@@ -264,8 +289,8 @@ void gameObject::update() {
 
     }
 
+    breathingAnimation();
     // prosta logika usuwania poza ekranem
-
 
     if (!isEnemy) {
         // Usuwamy jednostki gracza poza ekranem, tej samej logiki się użyje do hp wieży
