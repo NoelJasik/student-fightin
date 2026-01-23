@@ -64,9 +64,9 @@ void uiStatsBox::render(SDL_Renderer* renderer,
     SDL_SetRenderDrawColor(renderer, 60, 160, 60, 230);
     SDL_RenderFillRect(renderer, &lvlUpButton);
 
-    text.render("LVL UP", lvlUpButton.x + 8, lvlUpButton.y + 3);
+    text.render("LVL UP  5$", lvlUpButton.x + 8, lvlUpButton.y + 3);
 }
-bool uiStatsBox::handleEvent(const SDL_Event& e, gameObject& obj, NotificationManager& notification_manager)
+bool uiStatsBox::handleEvent(const SDL_Event& e, gameObject& obj, NotificationManager& notification_manager, ekonomia& ekonomia)
 {
     if (e.type == SDL_MOUSEBUTTONDOWN &&
         e.button.button == SDL_BUTTON_LEFT)
@@ -79,14 +79,17 @@ bool uiStatsBox::handleEvent(const SDL_Event& e, gameObject& obj, NotificationMa
             my >= lvlUpButton.y &&
             my <= lvlUpButton.y + lvlUpButton.h)
         {
-            if (obj.lvl+1>8) {
-                notification_manager.add("Maksymalny lvl jednostki to 8");
+            if (ekonomia.getMoney()-5<0) {
+                notification_manager.add("Nie stac cie na ulepszenie ,koszt to 5$");
+            }else {
+                if (obj.lvl+1>8) {
+                    notification_manager.add("Maksymalny lvl jednostki to 8");
 
-            }else if(obj.lvl+1==8){
-                obj.levelUp();
-            }
-            else {
-                obj.levelUp();
+                }
+                else {
+                    obj.levelUp();
+                    ekonomia.kasa=ekonomia.kasa-5;
+                }
             }
             return true;
         }

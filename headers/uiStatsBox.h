@@ -8,6 +8,7 @@
 #include <SDL.h>
 #include "TextRenderer.h"
 #include "notification.h"
+#include "ekonomia.h"
 class uiStatsBox {
 public:
     SDL_Rect lvlUpButton;
@@ -16,6 +17,6 @@ public:
                 TextRenderer& text,
                 gameObject& obj);
 
-    bool handleEvent(const SDL_Event& e, gameObject& obj, NotificationManager& notification_manager);
+    bool handleEvent(const SDL_Event& e, gameObject& obj, NotificationManager& notification_manager, ekonomia& ekonomia);
 };
 #endif //UNIPROJECT_UISTATSBOX_H

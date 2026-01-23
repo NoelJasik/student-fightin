@@ -18,7 +18,7 @@ public:
     Button startWaveButton;
     bool startWaveClicked = false;
     bool handleEvent(const SDL_Event& e, int& current_tower);
-    void render(SDL_Renderer* renderer, int current_tower, int money,  TextRenderer& text, int currentWave, bool activeWave, float playerHealth);
+    void render(SDL_Renderer* renderer, int current_tower, int money,  TextRenderer& text, int currentWave, bool activeWave, float playerHealth, int maxWave);
     void resetStartWaveClicked();
 };
 #endif //UNIPROJECT_TOPBAR_H
