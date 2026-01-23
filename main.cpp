@@ -20,6 +20,7 @@ int currentWave = 9;
 float playerHealth = 100.0f;
 vector<gameObject> towers;
 vector<gameObject> enemies;
+
 bool activeWave=false;
 bool endWave=false;
 bool gameWon = false;
@@ -105,6 +106,8 @@ if(!renderer || !textRenderer) {
 SDL_Surface *background_surface = IMG_Load("assets/bg.jpg");
 SDL_Surface *TTF_RenderText_Solid(TTF_Font *font, const char *str, int fg, SDL_Color sdl_color);
 SDL_Surface *tower_surface = IMG_Load("assets/student.png");
+SDL_Surface *tower2_surface = IMG_Load("assets/Koparka1.png");
+SDL_Surface *tower3_surface = IMG_Load("assets/sklep.png");
 SDL_Surface *enemy_surface = IMG_Load("assets/kibolUnit.png");
 
 uiStatsBox stats_box;
@@ -134,14 +137,15 @@ void spawnTower(int _x, int _y, int _type) {
         default:
             return;
         case 1:
-            tower = gameObject(_x, _y, 50, 90, "Student", 100, 10, 1.0, false, 0, 0, 0.05f, 60);
+            tower = gameObject(_x, _y, 40, 82, "Student", 100, 10, 1.0, false, 0, 0, 0.05f, 60, 1);
             break;
         case 2:
-            tower = gameObject(_x, _y, 100, 200, "Koparka", 10000, 10, 5, false, 0, 0, 0.05f, 8600);
+            tower = gameObject(_x, _y, 70, 75, "Koparka", 10000, 10, 5, false, 0, 0, 0.0005f, 8600, 2);
             tower.setMaxMoveSpeed(0, 10);
+            tower.setCurrentMoveSpeed(0, 0);
             break;
         case 3:
-            tower = gameObject(_x, _y, 100, 100, "Duet", 150, 10, 1.0, false, 0, 0, 0.05f, 0);
+            tower = gameObject(_x, _y, 105, 65, "Duet", 150, 1, 1.0, false, 0, 0, 0.05f, 0, 3);
             break;
     }
     // wycentrowanie
@@ -179,12 +183,12 @@ void startWave() {
             float power = basePower * randomScale;
             float sizeScale = 0.7f + rnd * 0.6f; // ~0.7 .. 1.3
 
-            int w = static_cast<int>(50 * sizeScale);
-            int h = static_cast<int>(90 * sizeScale);
+            int w = static_cast<int>(58 * sizeScale);
+            int h = static_cast<int>(68 * sizeScale);
             if (w < 20) w = 20;
             if (h < 30) h = 30;
-            if (w > 200) w = 200;
-            if (h > 300) h = 300;
+            if (w > 120) w = 120;
+            if (h > 170) h = 170;
 
             int hp = static_cast<int>(50 * power);
             int dmg = static_cast<int>(10 * power);
@@ -346,6 +350,25 @@ int main(int argc, char *argv[]) {
         SDL_Quit();
         return 1;
     }
+    auto tower2_texture = SDL_CreateTextureFromSurface(renderer, tower2_surface);
+    SDL_FreeSurface(tower2_surface);
+    if (!tower2_texture) {
+        cout << "SDL_CreateTextureFromSurface error: " << SDL_GetError() << endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 2;
+    }
+    auto tower3_texture = SDL_CreateTextureFromSurface(renderer, tower3_surface);
+    SDL_FreeSurface(tower3_surface);
+    if (!tower3_texture) {
+        cout << "SDL_CreateTextureFromSurface error: " << SDL_GetError() << endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 3;
+    }
+
 
     if (!enemy_surface) {
         cout << "IMG_Load error: " << IMG_GetError() << endl;
@@ -594,7 +617,15 @@ int main(int argc, char *argv[]) {
         topBar.render(renderer, current_tower, uiEkonomia.getMoney(), notficiationsTextRenderer, currentWave, isStillWave(), playerHealth);
         // TODO - renderowanie wież i przeciwników z ich grafikami, zamiast tej samej do wszystkiego
         for (auto &t: towers) {
-            SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
+            if (t.imageID == 1) {
+                SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
+            } else if (t.imageID == 3) {
+                SDL_RenderCopy(renderer, tower3_texture, nullptr, &t.rect);
+            } else if (t.imageID == 2) {
+                // Renderowanie koparki na końcu. chyba to będzie bardziej wydajniejsze bo one będą rzadziej wykorzystywane
+                SDL_RenderCopy(renderer, tower2_texture, nullptr, &t.rect);
+            }
+            // SDL_RenderCopy(renderer, tower_texture, nullptr, &t.rect);
             t.update();
         }
         for (auto &e: enemies) {

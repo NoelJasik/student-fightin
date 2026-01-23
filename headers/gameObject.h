@@ -11,11 +11,15 @@ class gameObject {
 // robie wszystko publiczne bo mam wywalone w optymalizacje, a do debugowania/pracy jest łatwiej
 private:
     float lastUpdateTime;
+    float startingWidth;
+    float startingHeight;
+
     // float &playerHealthRef;
 public:
     SDL_Rect rect{0,0,0,0};
     std::string name;
     // Pozycję do przemieszczania się
+    int imageID;
     float trueXPos;
     float trueYPos;
     int lvl;
@@ -36,15 +40,16 @@ public:
     bool isEnemy = false;
     // jak jest true to usuwamy z listy obiektów
     bool destroy = false;
-    SDL_Texture *image = nullptr;
+    // SDL_Texture *image = nullptr;
     gameObject();
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce);
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy);
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY);
     gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass);
-    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass, SDL_Texture* _image);
+    gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass, int imageID);
     // gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackDamage, float _attackForce, bool _isEnemy, float _maxSpeedX, float _maxSpeedY, float _accelerationSpeed, float _mass, SDL_Texture* _image, float &_playerHealth);
     void moveBySpeed();
+    void breathingAnimation();
 
 void moveToPoint(int _x, int _y);
 
