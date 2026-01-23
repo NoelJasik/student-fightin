@@ -95,16 +95,16 @@ void topBar::render(SDL_Renderer* renderer,
     std::string koszt = std::to_string(10 + (currentWave==1?0:(currentWave - 2)) * 5) + "$";
     int textW = 0, textH = 0;
     text.measure(koszt, textW, textH);
-    text.render(koszt, 10, (rect.h - textH) / 2);
+    text.render(koszt, 10, (rect.h - textH) / 2, SDL_Color{0, 0, 0, 255});
 
 
     std::string koszt2 = std::to_string(50 + (currentWave==1?0:(currentWave - 2))  * 5)  + "$";
     text.measure(koszt2, textW, textH);
-    text.render(koszt2, 70, (rect.h - textH) / 2);
+    text.render(koszt2, 70, (rect.h - textH) / 2, SDL_Color{0, 0, 0, 255});
 
     std::string koszt3 = std::to_string(75 + (currentWave==1?0:(currentWave - 2)) * 5)  + "$";
     text.measure(koszt3, textW, textH);
-    text.render(koszt3, 130, (rect.h - textH) / 2);
+    text.render(koszt3, 130, (rect.h - textH) / 2, SDL_Color{0, 0, 0, 255});
     // ---------- KASA ----------
     std::string moneyText = "Saldo: $ " + std::to_string(money);
 
