@@ -244,7 +244,7 @@ void gameObjectCleanup() {
         activeWave = false;
     }
 
-    // TODO Dodać do klasy gameobject funkcję onDestroy która się tu odpala, tam wjebiemy logike na dodawanie siana itd
+    // TODO Dodać do klasy gameobject funkcję onDestroy która się tu odpala, tam wrzucimy logike na dodawanie siana itd
     std::erase_if(towers, [](const gameObject &t) {
         // displayDebug();
         return t.destroy;
@@ -544,7 +544,7 @@ int main(int argc, char *argv[]) {
                             // cout << "Distance: " << distance << " [i]" << i << endl;
                             if (distance < 50) {
                                 can_be_placed = false;
-                                // to jest zjebane, bo psuje gameplay zatrzymując całą grę
+                                // to jest zepsute, bo psuje gameplay zatrzymując całą grę
                                 // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
                                 break;
                             }
@@ -555,7 +555,7 @@ int main(int argc, char *argv[]) {
                                 towers[i], gameObject(e.button.x, e.button.y, 20, 30, "Infantry Tower", 100, 10, 1.0));
                             if (distance < 75) {
                                 can_be_placed = false;
-                                // to jest zjebane, bo psuje gameplay zatrzymując całą grę
+                                // to jest zepsute, bo psuje gameplay zatrzymując całą grę
                                 // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Komunikat", "Nie mozesz postawic tutaj jednostki, znajduje sie ona zbyt blisko innej", NULL);
                                 break;
                             }
@@ -566,7 +566,7 @@ int main(int argc, char *argv[]) {
                         // inputBox.open(e.button.x, e.button.y, current_tower);
                         if (uiEkonomia.getMoney() >= kosztjednostki) {
                             bool dodawanie = false;
-                            uiEkonomia.liczenie(kosztjednostki, dodawanie);//tutaj wjebać odejmowanie kasy
+                            uiEkonomia.liczenie(kosztjednostki, dodawanie);//tutaj wrzucić odejmowanie kasy
 
                             spawnTower(
                                 e.button.x,
