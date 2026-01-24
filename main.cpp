@@ -271,6 +271,7 @@ void gameObjectCleanup() {
         replayButton.rect.y = ScreenSize::getHeight() / 2 + 60;
 
         replayButton.isActionButton = true;
+        replayButton.color = {0, 100, 0, 255};
     }
 }
 
@@ -285,6 +286,7 @@ void onPlayerDeath() {
     defeatReplayButton.rect.y = ScreenSize::getHeight() / 2 + 60;
 
     defeatReplayButton.isActionButton = true;
+    defeatReplayButton.color = {150, 0, 0, 255};
 }
 
 
@@ -588,7 +590,7 @@ int main(int argc, char *argv[]) {
                         // inputBox.open(e.button.x, e.button.y, current_tower);
                         if (uiEkonomia.getMoney() >= kosztjednostki) {
                             bool dodawanie = false;
-                            uiEkonomia.liczenie(kosztjednostki, dodawanie);//tutaj wjebać odejmowanie kasy
+                            uiEkonomia.liczenie(kosztjednostki, dodawanie);//tutaj dodać odejmowanie kasy
 
                             spawnTower(
                                 e.button.x,

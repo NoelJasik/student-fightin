@@ -25,5 +25,8 @@
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/sdl2_ttf-src/external/freetype" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/sdl2_ttf-src/external/freetype/subprojects/dlg" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/sdl2_ttf-src/external/harfbuzz" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/sdl2_ttf-src/external/plutosvg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/sdl2_ttf-src/external/plutosvg/plutovg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/sdl2_ttf-src/external/plutovg" vcs="Git" />
   </component>
 </project>
