@@ -40,6 +40,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     attackForce = _attackspeed;
     hp = _hp;
     update();
+    isAttackingAGH = false;
+
 }
 
 gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float _hp, float _attackdamage,
@@ -60,6 +62,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     attackDamage = _attackdamage;
     attackForce = _attackspeed;
     isEnemy = _isEnemy;
+    isAttackingAGH = false;
+
     update();
 }
 
@@ -82,6 +86,7 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     attackForce = _attackspeed;
     isEnemy = _isEnemy;
     setMaxMoveSpeed(_maxSpeedY, _maxSpeedX);
+    isAttackingAGH = false;
     // setCurrentMoveSpeed(_maxSpeedY, _maxSpeedX);
     update();
 }
@@ -107,6 +112,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     accelerationSpeed = _accelerationSpeed;
     mass = _mass;
     setMaxMoveSpeed(_maxSpeedY, _maxSpeedX);
+    isAttackingAGH = false;
+
     // setCurrentMoveSpeed(_maxSpeedY, _maxSpeedX);
     update();
 }
@@ -132,6 +139,8 @@ gameObject::gameObject(int _x, int _y, int _w, int _h, std::string _name, float 
     mass = _mass;
     imageID = _imageId;
     setMaxMoveSpeed(_maxSpeedY, _maxSpeedX);
+    isAttackingAGH = false;
+
     // setCurrentMoveSpeed(_maxSpeedY, _maxSpeedX);
     update();
 }
@@ -278,6 +287,7 @@ void gameObject::breathingAnimation() {
 // wywoływane co klatkę
 void gameObject::update() {
 
+
     moveBySpeed();
     if (hp <= 0) {
         destroy = true;
@@ -294,7 +304,7 @@ void gameObject::update() {
         if (rect.x > ScreenSize::getWidth() || rect.x < -100) {
             destroy = true;
         }
-    } else if (rect.x < -10) {
+    } else if (trueXPos < -10 && isEnemy) {
         // playerHealthRef -= attackDamage;
         isAttackingAGH = true;
         destroy = true;

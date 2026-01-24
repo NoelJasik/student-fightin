@@ -16,7 +16,7 @@
 using namespace std;
 // Można wyciągnąć z tego klase screensize
 using namespace gameSettings;
-int currentWave = 1;
+int currentWave = 7;
 int maxWave = 8;
 float playerHealth = 100.0f;
 vector<gameObject> towers;
@@ -250,7 +250,7 @@ void gameObjectCleanup() {
         return t.destroy;
     });
     std::erase_if(enemies, [](const gameObject &e) {
-        if (e.isAttackingAGH) {
+        if (e.isAttackingAGH == true) {
             playerHealth -= e.attackDamage;
         }
 
@@ -441,7 +441,7 @@ int main(int argc, char *argv[]) {
                     enemies.clear();
                     uiEkonomia.kasa = uiEkonomia.kasaStartowa;
 
-                    notification_manager.add("Nowa gra rozpoczęta!");
+                    notification_manager.add("Nowa gra rozpoczeta!");
                     continue;
                 }
             }
