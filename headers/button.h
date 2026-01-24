@@ -14,6 +14,7 @@ public:
     bool handleEvent(const SDL_Event& e, int& current_tower);
     void render(SDL_Renderer* renderer);
     SDL_Rect rect{};
+    SDL_Color color = {255, 255, 255, 255};
     int towerId = 0;
 };
 
