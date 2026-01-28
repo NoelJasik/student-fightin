@@ -16,7 +16,7 @@
 using namespace std;
 // Można wyciągnąć z tego klase screensize
 using namespace gameSettings;
-int currentWave = 7;
+int currentWave = 1;
 int maxWave = 8;
 float playerHealth = 100.0f;
 vector<gameObject> towers;
